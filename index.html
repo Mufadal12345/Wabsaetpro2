@@ -3,38 +3,246 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>بوابة متحف الفكر وادارة المحتوى (Firebase)</title>
+    <title>متحف بوابة الفكر وادارة المحتوى (Firebase)</title>
     <!-- تضمين Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- ************************************************************************* -->
-    <!-- الخطوة 1: تحميل ملف config.js الذي يحتوي على البيانات السرية -->
-    <!-- ************************************************************************* -->
-    <script src="./config.js"></script> 
-    
-    <!-- تضمين مكتبات Firebase SDK الضرورية -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, getDoc, addDoc, setDoc, updateDoc, onSnapshot, collection, query, where, getDocs, orderBy, runTransaction } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-        import { setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    <style>
+        /* نفس الأنماط السابقة */
+        body {
+            font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+        }
+        .main-bg {
+            background: linear-gradient(135deg, #1f2937 0%, #171717 100%);
+        }
+        .section-body-rendered p { margin-bottom: 1rem; }
+        .section-body-rendered strong { font-weight: bold; }
+        .section-body-rendered ul { list-style: disc; margin-right: 1.5rem; padding-right: 0.5rem; margin-bottom: 1rem;}
+        .section-body-rendered .highlight-quote {
+            border-right: 4px solid #f59e0b;
+            background-color: #fffbeb;
+            padding: 1rem;
+            margin-top: 1rem;
+            margin-bottom: 1rem;
+            font-size: 1.25rem;
+            font-style: italic;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+            color: #1f2937;
+        }
+        .editor-textarea { min-height: 150px; }
+        .error-flash { transition: opacity 0.5s ease-out; }
+        .badge {
+            display: inline-block;
+            padding: 0.25em 0.6em;
+            font-size: 75%;
+            font-weight: 700;
+            line-height: 1;
+            text-align: center;
+            white-space: nowrap;
+            vertical-align: baseline;
+            border-radius: 0.25rem;
+        }
+    </style>
+</head>
+<body class="main-bg min-h-screen flex items-center justify-center p-4">
 
-        // إعداد مستوى سجل الأخطاء للمساعدة في التصحيح
-        setLogLevel('Debug');
+    <!-- نفس واجهة المستخدم السابقة -->
+    <div id="app" class="w-full max-w-6xl bg-stone-100 shadow-2xl rounded-xl p-6 md:p-10 transition-all duration-500">
         
-        // =========================================================================
-        // === الخطوة 2: قراءة بيانات التهيئة من ملف config.js المحمّل عالمياً ===
-        // =========================================================================
+        <!-- نفس محتوى HTML السابق -->
+        <!-- ... -->
+        
+    </div>
+
+    <!-- تضمين ملف config.js -->
+    <script src="./config.js"></script>
+
+    <!-- تضمين Firebase SDK - الإصدار 12.7.0 -->
+    <script type="module">
+        // استيراد من الإصدار 12.7.0
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-app.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-auth.js";
+        import { getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc, collection, query, where, getDocs, onSnapshot, orderBy, serverTimestamp, increment } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-analytics.js";
+
+        // استخدام الإعدادات من config.js
         const firebaseConfig = window.FIREBASE_CONFIG;
-        const adminCredentials = window.ADMIN_CREDENTIALS;
+        const ADMIN_CREDENTIALS = window.ADMIN_CREDENTIALS;
+        const TEMPLATES = window.TEMPLATES;
+        const SUGGESTION_CATEGORIES = window.SUGGESTION_CATEGORIES;
+        const SUGGESTION_STATUSES = window.SUGGESTION_STATUSES;
 
-        const appId = firebaseConfig.projectId || 'default-app-id'; // Project ID يستخدم كمعرف للتطبيق
-        const initialAuthToken = null; // نعتمد على تسجيل الدخول المجهول/النموذج
+        // تهيئة Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const analytics = getAnalytics(app);
 
-        // فحص سريع للقيم الافتراضية
-        if (firebaseConfig.apiKey === "YOUR_FIREBASE_API_KEY_HERE" || !firebaseConfig.projectId) {
-            console.error("Firebase config is missing or using placeholder values! Check config.js");
-            document.getElementById('loader').innerHTML = '<p class="text-rose-600 text-lg">خطأ في إعداد Firebase. الرجاء استبدال القيم الافتراضية في ملف **config.js** ببيانات مشروعك.</p>';
+        // ... باقي الكود كما كان ...
+
+        // المتغيرات العامة
+        let currentUser = null;
+        let userDocument = null;
+        let isAdmin = false;
+
+        window.globalApp = {};
+
+        // ==========================================================
+        // وظائف العرض والتحكم
+        // ==========================================================
+
+        function displayError(message) {
+            const errorFlash = document.getElementById('global-error-message');
+            const errorText = document.getElementById('global-error-text');
+            
+            errorText.textContent = message;
+            errorFlash.classList.remove('hidden');
+            setTimeout(() => {
+                errorFlash.classList.remove('opacity-0');
+                errorFlash.classList.add('opacity-100');
+            }, 10);
+
+            setTimeout(() => {
+                errorFlash.classList.remove('opacity-100');
+                errorFlash.classList.add('opacity-0');
+                setTimeout(() => errorFlash.classList.add('hidden'), 500);
+            }, 5000);
+        }
+
+        function showView(viewId) {
+            ['loader', 'registration-view', 'home-view', 'management-view'].forEach(id => {
+                const view = document.getElementById(id);
+                if (view) view.classList.add('hidden');
+            });
+            const activeView = document.getElementById(viewId);
+            if (activeView) activeView.classList.remove('hidden');
+        }
+
+        // ==========================================================
+        // إدارة المستخدمين والتسجيل
+        // ==========================================================
+
+        async function registerUser(name, specialty) {
+            try {
+                // تسجيل الدخول مجهولاً
+                const userCredential = await signInAnonymously(auth);
+                currentUser = userCredential.user;
+
+                // التحقق إذا كان مديراً
+                isAdmin = (name === ADMIN_CREDENTIALS.name && specialty === ADMIN_CREDENTIALS.specialty);
+
+                // حفظ بيانات المستخدم في Firestore
+                const userRef = doc(db, 'users', currentUser.uid);
+                await setDoc(userRef, {
+                    name: name,
+                    specialty: specialty,
+                    isAdmin: isAdmin,
+                    createdAt: serverTimestamp(),
+                    lastLogin: serverTimestamp(),
+                    suggestionCount: 0
+                }, { merge: true });
+
+                userDocument = {
+                    id: currentUser.uid,
+                    name: name,
+                    specialty: specialty,
+                    isAdmin: isAdmin
+                };
+
+                // تحديث واجهة المستخدم
+                document.getElementById('user-display-name').textContent = name;
+                document.getElementById('user-specialty').textContent = specialty;
+                
+                if (isAdmin) {
+                    document.getElementById('admin-name').textContent = name;
+                    await globalApp.loadAdminData();
+                    showView('management-view');
+                } else {
+                    await globalApp.checkUserSuggestions();
+                    globalApp.renderHomeView();
+                    showView('home-view');
+                }
+
+                return true;
+            } catch (error) {
+                console.error("Error registering user:", error);
+                displayError("حدث خطأ أثناء التسجيل: " + error.message);
+                return false;
+            }
+        }
+
+        // ... باقي الدوال كما كانت في الكود السابق ...
+
+        // عند تحميل الصفحة
+        window.onload = () => {
+            showView('loader');
+            setTimeout(() => {
+                showView('registration-view');
+            }, 1000);
+        };
+
+        // تسجيل المستخدم
+        document.getElementById('registration-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const name = document.getElementById('name').value.trim();
+            const specialty = document.getElementById('specialty').value.trim();
+            const errorMessage = document.getElementById('error-message');
+            errorMessage.classList.add('hidden');
+
+            if (!name || !specialty) {
+                errorMessage.textContent = 'الرجاء إدخال الاسم والتخصص.';
+                errorMessage.classList.remove('hidden');
+                return;
+            }
+
+            const success = await registerUser(name, specialty);
+            if (!success) {
+                errorMessage.textContent = 'حدث خطأ في التسجيل. حاول مرة أخرى.';
+                errorMessage.classList.remove('hidden');
+            }
+        });
+
+        // التحقق من حالة المصادقة عند التحميل
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                currentUser = user;
+                
+                // جلب بيانات المستخدم من Firestore
+                try {
+                    const userRef = doc(db, 'users', user.uid);
+                    const userDoc = await getDoc(userRef);
+                    
+                    if (userDoc.exists()) {
+                        userDocument = { id: userDoc.id, ...userDoc.data() };
+                        isAdmin = userDocument.isAdmin;
+                        
+                        if (isAdmin) {
+                            document.getElementById('admin-name').textContent = userDocument.name;
+                            await globalApp.loadAdminData();
+                            showView('management-view');
+                        } else {
+                            document.getElementById('user-display-name').textContent = userDocument.name;
+                            document.getElementById('user-specialty').textContent = userDocument.specialty;
+                            await globalApp.checkUserSuggestions();
+                            globalApp.renderHomeView();
+                            showView('home-view');
+                        }
+                    } else {
+                        // إذا كان المستخدم مصادقاً ولكن ليس له مستند
+                        showView('registration-view');
+                    }
+                } catch (error) {
+                    console.error("Error loading user data:", error);
+                    showView('registration-view');
+                }
+            } else {
+                // لا يوجد مستخدم مصادق
+                showView('registration-view');
+            }
+        });
+
+    </script>
+</body>
+</html>            document.getElementById('loader').innerHTML = '<p class="text-rose-600 text-lg">خطأ في إعداد Firebase. الرجاء استبدال القيم الافتراضية في ملف **config.js** ببيانات مشروعك.</p>';
             return;
         }
         
