@@ -1,259 +1,169 @@
 <!DOCTYPE html>
-<html lang="ar">
+<html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>نظام الأقسام – Firebase</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <script src="config.js"></script>
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>بوابة منارة الفكر - الإدارة السحابية</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="./config.js"></script> 
+    
     <style>
-        body {
-            font-family: Tahoma, Arial;
-            background: #0f172a;
-            color: #e5e7eb;
-            margin: 0;
-        }
-        header {
-            background: #020617;
-            padding: 15px;
-            text-align: center;
-            font-size: 20px;
-            font-weight: bold;
-        }
-        nav {
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-            background: #020617;
-            padding-bottom: 10px;
-        }
-        nav button {
-            padding: 8px 16px;
-            border: none;
-            border-radius: 6px;
-            background: #1e293b;
-            color: #fff;
-            cursor: pointer;
-        }
-        nav button:hover {
-            background: #334155;
-        }
-        section {
-            padding: 20px;
-        }
-        .hidden {
-            display: none;
-        }
-        .card {
-            background: #020617;
-            border-radius: 10px;
-            padding: 15px;
-            margin-bottom: 15px;
-        }
-        input, textarea {
-            width: 100%;
-            padding: 8px;
-            margin-top: 5px;
-            border-radius: 5px;
-            border: none;
-        }
-        textarea {
-            resize: vertical;
-        }
-        .btn {
-            background: #2563eb;
-            color: #fff;
-            padding: 8px 14px;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            margin-top: 10px;
-        }
-        .btn.danger {
-            background: #dc2626;
-        }
-        footer {
-            text-align: center;
-            padding: 10px;
-            background: #020617;
-            font-size: 12px;
-            color: #94a3b8;
-        }
+        body { font-family: 'Inter', system-ui, sans-serif; }
+        .main-bg { background: linear-gradient(135deg, #1f2937 0%, #111827 100%); }
+        .section-body-rendered p { margin-bottom: 1rem; }
+        .highlight-quote { border-right: 4px solid #f59e0b; background: #fffbeb; padding: 1rem; font-style: italic; }
+        .hidden { display: none; }
     </style>
 </head>
+<body class="main-bg min-h-screen flex items-center justify-center p-4 text-gray-800">
 
-<body>
-
-<header>📘 نظام الأقسام (Realtime Firebase)</header>
-
-<nav>
-    <button onclick="showHome()">🏠 العرض</button>
-    <button onclick="showAdmin()">⚙️ الإدارة</button>
-</nav>
-
-<section id="home-view"></section>
-
-<section id="admin-view" class="hidden">
-    <div class="card">
-        <h3>تسجيل دخول المدير</h3>
-        <input id="admin-name" placeholder="الاسم">
-        <input id="admin-specialty" placeholder="الرمز">
-        <button class="btn" onclick="loginAdmin()">دخول</button>
-        <p id="login-error" style="color:#f87171"></p>
-    </div>
-
-    <div id="admin-panel" class="hidden">
-        <div class="card">
-            <h3>إضافة قسم</h3>
-            <input id="new-title" placeholder="عنوان القسم">
-            <textarea id="new-content" placeholder="المحتوى"></textarea>
-            <button class="btn" onclick="addSection()">➕ إضافة</button>
+    <div id="app" class="w-full max-w-4xl bg-stone-100 shadow-2xl rounded-xl p-6 md:p-10 transition-all">
+        
+        <div id="registration-view">
+            <h1 class="text-3xl font-extrabold text-blue-900 mb-6 text-center">انضم إلى منارة الفكر</h1>
+            <p class="text-gray-600 mb-8 text-center">أدخل بياناتك لتبدأ في استكشاف أثرك الفكري.</p>
+            <form id="registration-form" class="space-y-6">
+                <input type="text" id="reg-name" placeholder="الاسم" required class="w-full px-4 py-3 border rounded-lg focus:ring-blue-800 outline-none">
+                <input type="text" id="reg-spec" placeholder="التخصص" required class="w-full px-4 py-3 border rounded-lg focus:ring-blue-800 outline-none">
+                <button type="submit" class="w-full py-3 bg-blue-800 text-white rounded-lg font-bold hover:bg-blue-900 transition">دخول</button>
+            </form>
+            <p id="reg-error" class="text-red-600 text-center mt-4 hidden">بيانات غير صحيحة</p>
         </div>
 
-        <div id="sections-editor"></div>
+        <div id="home-view" class="hidden">
+            <div class="flex justify-between items-center mb-6 border-b pb-4">
+                <h2 class="text-2xl font-bold text-blue-900">أهلاً بك، <span id="user-name-display"></span></h2>
+                <button onclick="location.reload()" class="text-sm text-red-600">خروج</button>
+            </div>
+            <div id="dynamic-sections-list" class="space-y-3"></div>
+        </div>
+
+        <div id="management-view" class="hidden">
+            <div class="flex justify-between items-center mb-8 border-b-2 border-rose-200 pb-4">
+                <h1 class="text-2xl font-bold text-rose-800">🔐 لوحة الإدارة السحابية</h1>
+                <button onclick="location.reload()" class="bg-gray-200 px-3 py-1 rounded">خروج</button>
+            </div>
+
+            <div class="flex gap-4 mb-6">
+                <button onclick="showAdminTab('sections')" class="flex-1 py-2 bg-blue-700 text-white rounded-lg">إدارة المحتوى</button>
+                <button onclick="showAdminTab('users')" class="flex-1 py-2 bg-emerald-700 text-white rounded-lg">قائمة المنضمين 👥</button>
+            </div>
+
+            <div id="admin-sections-tab">
+                <button onclick="openEditor('new')" class="mb-4 w-full py-2 bg-emerald-600 text-white rounded">+ إضافة قسم جديد</button>
+                <div id="editable-sections-list" class="space-y-2"></div>
+            </div>
+
+            <div id="admin-users-tab" class="hidden">
+                <h3 class="font-bold mb-4 text-gray-700">الأشخاص الذين سجلوا دخولهم:</h3>
+                <div id="joiners-list" class="bg-white rounded-lg shadow divide-y">
+                    <p class="p-4 text-center text-gray-400">جاري تحميل قائمة المنضمين...</p>
+                </div>
+            </div>
+        </div>
     </div>
-</section>
 
-<footer>Realtime Firebase System</footer>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
+        import { getDatabase, ref, set, push, onValue, get } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-database.js";
+        import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
 
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-import { getDatabase, ref, get, set, onValue } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
+        const app = initializeApp(window.FIREBASE_CONFIG);
+        const db = getDatabase(app);
+        const auth = getAuth(app);
 
-/* Firebase Init */
-const app = initializeApp(window.FIREBASE_CONFIG);
-const db = getDatabase(app);
-const sectionsRef = ref(db, "sections");
+        // الدخول المجهول لضمان الاتصال
+        signInAnonymously(auth);
 
-/* Global State */
-let globalSectionsData = [];
-let isAdmin = false;
+        // وظيفة تسجيل المستخدم وحفظ بياناته في Firebase
+        document.getElementById('registration-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const name = document.getElementById('reg-name').value.trim();
+            const spec = document.getElementById('reg-spec').value.trim();
 
-/* Initial Data */
-const initialSectionsData = [
-    {
-        id: "sec-1",
-        order: 1,
-        title: "مرحبا بك",
-        content: "هذا مثال لقسم يتم تحميله من Firebase"
-    }
-];
+            // تحقق إذا كان المدير (Rasha)
+            if (name === window.ADMIN_CREDENTIALS.name && spec === window.ADMIN_CREDENTIALS.specialty) {
+                loadAdminData();
+                showView('management-view');
+                return;
+            }
 
-/* Load Data */
-async function loadSectionsData() {
-    const snap = await get(sectionsRef);
-    if (snap.exists()) {
-        globalSectionsData = Object.values(snap.val()).sort((a,b)=>a.order-b.order);
-    } else {
-        globalSectionsData = initialSectionsData;
-        saveSectionsData();
-    }
-    renderHome();
-}
+            // للمستخدم العادي: حفظ البيانات في فرع "joiners"
+            const newUserRef = push(ref(db, 'joiners'));
+            await set(newUserRef, {
+                name: name,
+                specialty: spec,
+                date: new Date().toLocaleString('ar-DZ')
+            });
 
-/* Save Data */
-function saveSectionsData() {
-    const obj = {};
-    globalSectionsData.forEach(s => obj[s.id] = s);
-    set(sectionsRef, obj);
-}
+            document.getElementById('user-name-display').textContent = name;
+            loadHomeData();
+            showView('home-view');
+        });
 
-/* Realtime Listener */
-onValue(sectionsRef, snap => {
-    if (snap.exists()) {
-        globalSectionsData = Object.values(snap.val()).sort((a,b)=>a.order-b.order);
-        renderHome();
-        if (isAdmin) renderEditor();
-    }
-});
+        // ميزة المدير: تحميل قائمة المنضمين
+        function loadAdminData() {
+            // تحميل الأقسام
+            onValue(ref(db, 'sections'), (snapshot) => {
+                const list = document.getElementById('editable-sections-list');
+                list.innerHTML = "";
+                snapshot.forEach(child => {
+                    const sec = child.val();
+                    list.innerHTML += `<div class="p-3 bg-white border rounded flex justify-between">
+                        <span>${sec.title}</span>
+                        <span class="text-xs text-gray-400">ID: ${child.key}</span>
+                    </div>`;
+                });
+            });
 
-/* Render Home */
-function renderHome() {
-    const home = document.getElementById("home-view");
-    home.innerHTML = "";
-    globalSectionsData.forEach(sec => {
-        const div = document.createElement("div");
-        div.className = "card";
-        div.innerHTML = `<h3>${sec.title}</h3><p>${sec.content}</p>`;
-        home.appendChild(div);
-    });
-}
+            // تحميل المنضمين
+            onValue(ref(db, 'joiners'), (snapshot) => {
+                const list = document.getElementById('joiners-list');
+                list.innerHTML = "";
+                if (!snapshot.exists()) { list.innerHTML = "<p class='p-4 text-center'>لا يوجد منضمين بعد.</p>"; return; }
+                
+                snapshot.forEach(child => {
+                    const user = child.val();
+                    list.innerHTML += `
+                        <div class="p-4 flex justify-between items-center">
+                            <div>
+                                <p class="font-bold text-blue-900">${user.name}</p>
+                                <p class="text-sm text-gray-500">${user.specialty}</p>
+                            </div>
+                            <span class="text-xs text-gray-400">${user.date}</span>
+                        </div>`;
+                });
+            });
+        }
 
-/* Admin */
-window.loginAdmin = function() {
-    const name = document.getElementById("admin-name").value;
-    const spec = document.getElementById("admin-specialty").value;
+        function loadHomeData() {
+            onValue(ref(db, 'sections'), (snapshot) => {
+                const list = document.getElementById('dynamic-sections-list');
+                list.innerHTML = "";
+                snapshot.forEach(child => {
+                    const sec = child.val();
+                    list.innerHTML += `<div class="p-4 bg-blue-100 rounded-lg shadow-sm border-r-4 border-blue-700">
+                        <h3 class="font-bold text-blue-900">${sec.title}</h3>
+                    </div>`;
+                });
+            });
+        }
 
-    if (name === window.ADMIN_CREDENTIALS.name && spec === window.ADMIN_CREDENTIALS.specialty) {
-        isAdmin = true;
-        document.getElementById("admin-panel").classList.remove("hidden");
-        document.getElementById("login-error").textContent = "";
-        renderEditor();
-    } else {
-        document.getElementById("login-error").textContent = "بيانات غير صحيحة";
-    }
-};
+        // أدوات مساعدة للواجهة
+        window.showView = (id) => {
+            ['registration-view', 'home-view', 'management-view'].forEach(v => document.getElementById(v).classList.add('hidden'));
+            document.getElementById(id).classList.remove('hidden');
+        };
 
-window.addSection = function() {
-    const title = document.getElementById("new-title").value;
-    const content = document.getElementById("new-content").value;
-    if (!title || !content) return;
-
-    globalSectionsData.push({
-        id: "sec-" + Date.now(),
-        order: globalSectionsData.length + 1,
-        title,
-        content
-    });
-    saveSectionsData();
-};
-
-function renderEditor() {
-    const editor = document.getElementById("sections-editor");
-    editor.innerHTML = "";
-    globalSectionsData.forEach(sec => {
-        const div = document.createElement("div");
-        div.className = "card";
-        div.innerHTML = `
-            <input value="${sec.title}" 
-                oninput="updateTitle('${sec.id}', this.value)">
-            <textarea oninput="updateContent('${sec.id}', this.value)">${sec.content}</textarea>
-            <button class="btn danger" onclick="deleteSection('${sec.id}')">🗑 حذف</button>
-        `;
-        editor.appendChild(div);
-    });
-}
-
-window.updateTitle = function(id, val) {
-    const sec = globalSectionsData.find(s=>s.id===id);
-    sec.title = val;
-    saveSectionsData();
-};
-
-window.updateContent = function(id, val) {
-    const sec = globalSectionsData.find(s=>s.id===id);
-    sec.content = val;
-    saveSectionsData();
-};
-
-window.deleteSection = function(id) {
-    globalSectionsData = globalSectionsData.filter(s=>s.id!==id);
-    saveSectionsData();
-};
-
-/* Navigation */
-window.showHome = function() {
-    document.getElementById("home-view").classList.remove("hidden");
-    document.getElementById("admin-view").classList.add("hidden");
-};
-
-window.showAdmin = function() {
-    document.getElementById("home-view").classList.add("hidden");
-    document.getElementById("admin-view").classList.remove("hidden");
-};
-
-loadSectionsData();
-</script>
-
+        window.showAdminTab = (tab) => {
+            if(tab === 'sections') {
+                document.getElementById('admin-sections-tab').classList.remove('hidden');
+                document.getElementById('admin-users-tab').classList.add('hidden');
+            } else {
+                document.getElementById('admin-sections-tab').classList.add('hidden');
+                document.getElementById('admin-users-tab').classList.remove('hidden');
+            }
+        };
+    </script>
 </body>
 </html>
