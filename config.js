@@ -1,5 +1,4 @@
 // config.js
-
 const FIREBASE_CONFIG = {
     apiKey: "AIzaSyB8JN73w75NQB7MifQMdOl1VcwifklyVZU",
     authDomain: "newpro-d5360.firebaseapp.com",
@@ -12,8 +11,8 @@ const FIREBASE_CONFIG = {
 };
 
 const ADMIN_CREDENTIALS = {
-    name: "Rasha",
-    specialty: "20250929"
+    name: "Rasha", 
+    specialty: "20250929" 
 };
 
 window.FIREBASE_CONFIG = FIREBASE_CONFIG;
