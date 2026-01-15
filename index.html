@@ -11,7 +11,6 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800&amp;family=Amiri:wght@400;700&amp;display=swap" rel="stylesheet">
     <style>
-        /* جميع الأنماط السابقة تبقى كما هي */
         body {
             box-sizing: border-box;
             font-family: 'Tajawal', sans-serif;
@@ -40,6 +39,21 @@
         @keyframes fade-in {
             from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes slideInRight {
+            from { transform: translateX(100%); }
+            to { transform: translateX(0); }
+        }
+        
+        @keyframes slideOutRight {
+            from { transform: translateX(0); }
+            to { transform: translateX(100%); }
+        }
+        
+        @keyframes rotate-slow {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
         }
         
         .animate-float {
@@ -75,6 +89,12 @@
             border: 1px solid rgba(255, 255, 255, 0.1);
         }
         
+        .glass-sidebar {
+            background: rgba(15, 23, 42, 0.98);
+            backdrop-filter: blur(20px);
+            border-left: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
         .gradient-bg {
             background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 25%, #312e81 50%, #4c1d95 75%, #581c87 100%);
         }
@@ -84,6 +104,96 @@
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
+        }
+        
+        .sidebar-item {
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+        }
+        
+        .sidebar-item:hover {
+            background: rgba(233, 69, 96, 0.15);
+            transform: translateX(-5px);
+        }
+        
+        .sidebar-item.active {
+            background: rgba(233, 69, 96, 0.25);
+            border-right: 4px solid #e94560;
+        }
+        
+        .sidebar-item.active::before {
+            content: '';
+            position: absolute;
+            right: 0;
+            top: 0;
+            height: 100%;
+            width: 4px;
+            background: linear-gradient(to bottom, #e94560, #f472b6);
+            box-shadow: 0 0 10px #e94560;
+        }
+        
+        @media (max-width: 768px) {
+            .sidebar-mobile {
+                position: fixed;
+                top: 0;
+                right: 0;
+                height: 100%;
+                width: 256px;
+                z-index: 50;
+                transform: translateX(100%);
+                transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            }
+            
+            .sidebar-mobile.sidebar-open {
+                transform: translateX(0);
+            }
+            
+            .sidebar-overlay {
+                position: fixed;
+                inset: 0;
+                background: rgba(0, 0, 0, 0.7);
+                backdrop-filter: blur(5px);
+                z-index: 40;
+                opacity: 0;
+                pointer-events: none;
+                transition: opacity 0.4s ease;
+            }
+            
+            .sidebar-overlay.active {
+                opacity: 1;
+                pointer-events: auto;
+            }
+        }
+        
+        .menu-toggle {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            z-index: 60;
+            background: rgba(233, 69, 96, 0.9);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 4px 20px rgba(233, 69, 96, 0.4);
+        }
+        
+        @media (min-width: 769px) {
+            .menu-toggle {
+                display: none;
+            }
+            
+            .sidebar-mobile {
+                position: relative;
+                transform: translateX(0) !important;
+            }
+        }
+        
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
         }
         
         .btn-primary {
@@ -131,6 +241,99 @@
             box-shadow: 0 0 0 3px rgba(233, 69, 96, 0.3);
         }
         
+        .modal-overlay {
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(8px);
+        }
+        
+        .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+        }
+        
+        .scrollbar-hide {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        
+        .category-tag {
+            background: linear-gradient(135deg, rgba(233, 69, 96, 0.3), rgba(244, 114, 182, 0.3));
+            border: 1px solid rgba(233, 69, 96, 0.5);
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, rgba(233, 69, 96, 0.2), rgba(244, 114, 182, 0.1));
+        }
+        
+        .quote-card {
+            background: linear-gradient(135deg, rgba(244, 114, 182, 0.1), rgba(251, 146, 60, 0.1));
+            border-right: 4px solid #f472b6;
+        }
+        
+        .toast {
+            animation: fade-in 0.3s ease-out;
+        }
+        
+        .badge {
+            background: linear-gradient(135deg, #e94560, #fb923c);
+            animation: bounce 1s infinite;
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateY(-25%); }
+            50% { transform: translateY(0); }
+        }
+        
+        .loading-spinner {
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-top-color: #e94560;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 0.8s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .role-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        
+        .role-admin {
+            background: linear-gradient(135deg, #fbbf24, #f59e0b);
+            color: #78350f;
+        }
+        
+        .role-premium {
+            background: linear-gradient(135deg, #a78bfa, #8b5cf6);
+            color: #f5f3ff;
+        }
+        
+        .role-user {
+            background: rgba(255, 255, 255, 0.2);
+            color: #e5e7eb;
+        }
+        
+        .avatar-pulse {
+            animation: pulse-glow 3s ease-in-out infinite;
+        }
+        
+        .logo-container {
+            position: relative;
+            display: inline-block;
+        }
+        
+        .logo-glow {
+            filter: drop-shadow(0 0 20px rgba(233, 69, 96, 0.6)) drop-shadow(0 0 40px rgba(251, 191, 36, 0.4));
+        }
+        
         .divider {
             display: flex;
             align-items: center;
@@ -168,201 +371,822 @@
             background: rgba(255, 255, 255, 0.1);
         }
         
-        .logo-glow {
-            filter: drop-shadow(0 0 20px rgba(233, 69, 96, 0.6)) drop-shadow(0 0 40px rgba(251, 191, 36, 0.4));
-        }
-        
-        .loading-spinner {
-            border: 3px solid rgba(255, 255, 255, 0.3);
-            border-top-color: #e94560;
-            border-radius: 50%;
-            width: 20px;
-            height: 20px;
-            animation: spin 0.8s linear infinite;
-        }
-        
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-        
-        .toast {
-            animation: fade-in 0.3s ease-out;
+        .line-clamp-2 {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
         }
     </style>
+    <style>@view-transition { navigation: auto; }</style>
 </head>
 <body class="h-full w-full gradient-bg text-white overflow-hidden">
+    <!-- Menu Toggle Button (Mobile) -->
+    <button id="menuToggle" onclick="toggleSidebar()" class="menu-toggle w-14 h-14 rounded-full flex items-center justify-center text-2xl hidden">🏛️</button>
     
-    <!-- Login Screen -->
-    <div id="loginScreen" class="h-full w-full flex items-center justify-center p-4 overflow-auto">
-        <div class="glass-card rounded-3xl p-8 w-full max-w-md animate-fade-in">
-            <div class="text-center mb-8">
-                <!-- Logo -->
-                <div class="mb-6 flex justify-center logo-container">
-                    <svg width="140" height="140" viewbox="0 0 140 140" xmlns="http://www.w3.org/2000/svg" class="logo-glow animate-float">
-                        <!-- SVG Logo Content -->
-                        <defs>
-                            <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                                <stop offset="0%" style="stop-color:#0f172a;stop-opacity:1" />
-                                <stop offset="30%" style="stop-color:#e94560;stop-opacity:0.9" />
-                                <stop offset="70%" style="stop-color:#f472b6;stop-opacity:0.9" />
-                                <stop offset="100%" style="stop-color:#fbbf24;stop-opacity:1" />
-                            </linearGradient>
-                            <linearGradient id="goldGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                                <stop offset="0%" style="stop-color:#fbbf24;stop-opacity:1" />
-                                <stop offset="50%" style="stop-color:#fcd34d;stop-opacity:1" />
-                                <stop offset="100%" style="stop-color:#fbbf24;stop-opacity:1" />
-                            </linearGradient>
-                            <filter id="glow">
-                                <feGaussianBlur stdDeviation="2" result="coloredBlur" />
-                                <feMerge>
-                                    <feMergeNode in="coloredBlur" />
-                                    <feMergeNode in="SourceGraphic" />
-                                </feMerge>
-                            </filter>
-                            <radialGradient id="glassGradient">
-                                <stop offset="0%" style="stop-color:#ffffff;stop-opacity:0.3" />
-                                <stop offset="100%" style="stop-color:#ffffff;stop-opacity:0.05" />
-                            </radialGradient>
-                        </defs>
-                        
-                        <circle cx="70" cy="70" r="65" fill="none" stroke="url(#logoGradient)" stroke-width="1.5" opacity="0.4" class="animate-rotate-slow" />
-                        <circle cx="70" cy="70" r="58" fill="url(#glassGradient)" filter="url(#glow)" />
-                        <circle cx="70" cy="70" r="58" fill="none" stroke="url(#logoGradient)" stroke-width="3" />
-                        
-                        <!-- Museum and Brain Icons -->
-                        <g transform="translate(35, 80)">
-                            <rect x="5" y="5" width="6" height="30" fill="#e94560" opacity="0.9" />
-                            <rect x="17" y="5" width="6" height="30" fill="#e94560" opacity="0.9" />
-                            <rect x="29" y="5" width="6" height="30" fill="#e94560" opacity="0.9" />
-                            <rect x="41" y="5" width="6" height="30" fill="#e94560" opacity="0.9" />
-                            <rect x="53" y="5" width="6" height="30" fill="#e94560" opacity="0.9" />
-                            <rect x="65" y="5" width="6" height="30" fill="#e94560" opacity="0.9" />
+    <!-- Sidebar Overlay (Mobile) -->
+    <div id="sidebarOverlay" class="sidebar-overlay" onclick="toggleSidebar()"></div>
+    
+    <div id="app" class="h-full w-full">
+        <!-- Login Screen -->
+        <div id="loginScreen" class="h-full w-full flex items-center justify-center p-4 overflow-auto">
+            <div class="glass-card rounded-3xl p-8 w-full max-w-md animate-fade-in">
+                <div class="text-center mb-8">
+                    <!-- Custom SVG Logo -->
+                    <div class="mb-6 flex justify-center logo-container">
+                        <svg width="140" height="140" viewbox="0 0 140 140" xmlns="http://www.w3.org/2000/svg" class="logo-glow animate-float">
+                            <defs>
+                                <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" style="stop-color:#0f172a;stop-opacity:1" />
+                                    <stop offset="30%" style="stop-color:#e94560;stop-opacity:0.9" />
+                                    <stop offset="70%" style="stop-color:#f472b6;stop-opacity:0.9" />
+                                    <stop offset="100%" style="stop-color:#fbbf24;stop-opacity:1" />
+                                </linearGradient>
+                                <linearGradient id="goldGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                                    <stop offset="0%" style="stop-color:#fbbf24;stop-opacity:1" />
+                                    <stop offset="50%" style="stop-color:#fcd34d;stop-opacity:1" />
+                                    <stop offset="100%" style="stop-color:#fbbf24;stop-opacity:1" />
+                                </linearGradient>
+                                <filter id="glow">
+                                    <feGaussianBlur stdDeviation="2" result="coloredBlur" />
+                                    <feMerge>
+                                        <feMergeNode in="coloredBlur" />
+                                        <feMergeNode in="SourceGraphic" />
+                                    </feMerge>
+                                </filter>
+                                <radialGradient id="glassGradient">
+                                    <stop offset="0%" style="stop-color:#ffffff;stop-opacity:0.3" />
+                                    <stop offset="100%" style="stop-color:#ffffff;stop-opacity:0.05" />
+                                </radialGradient>
+                            </defs>
                             
-                            <polygon points="37.5,-8 -2,5 77,5" fill="url(#goldGradient)" filter="url(#glow)" />
-                            <line x1="-2" y1="5" x2="77" y2="5" stroke="#fbbf24" stroke-width="2" />
-                            <rect x="0" y="35" width="75" height="6" fill="url(#goldGradient)" opacity="0.9" />
-                        </g>
-                        
-                        <g transform="translate(70, 42)">
-                            <ellipse cx="0" cy="0" rx="22" ry="18" fill="#f472b6" opacity="0.95" filter="url(#glow)" />
-                            <path d="M-10,-8 Q-15,-11 -13,-16 Q-10,-18 -5,-16 Q0,-20 5,-16 Q10,-18 13,-16 Q15,-11 10,-8" fill="none" stroke="#fbbf24" stroke-width="2.5" opacity="0.9" filter="url(#glow)" />
+                            <!-- Outer Rotating Ring -->
+                            <circle cx="70" cy="70" r="65" fill="none" stroke="url(#logoGradient)" stroke-width="1.5" opacity="0.4" class="animate-rotate-slow" />
                             
-                            <circle cx="-8" cy="-3" r="2.5" fill="#fbbf24" opacity="0.95" />
-                            <circle cx="8" cy="-3" r="2.5" fill="#fbbf24" opacity="0.95" />
-                            <circle cx="0" cy="4" r="2.5" fill="#fbbf24" opacity="0.95" />
-                            <circle cx="-4" cy="8" r="1.5" fill="#fcd34d" opacity="0.9" />
-                            <circle cx="4" cy="8" r="1.5" fill="#fcd34d" opacity="0.9" />
+                            <!-- Glass Circle Background -->
+                            <circle cx="70" cy="70" r="58" fill="url(#glassGradient)" filter="url(#glow)" />
+                            <circle cx="70" cy="70" r="58" fill="none" stroke="url(#logoGradient)" stroke-width="3" />
                             
-                            <line x1="-8" y1="-3" x2="0" y2="4" stroke="#fbbf24" stroke-width="1.5" opacity="0.6" />
-                            <line x1="8" y1="-3" x2="0" y2="4" stroke="#fbbf24" stroke-width="1.5" opacity="0.6" />
-                        </g>
-                    </svg>
+                            <!-- Museum Building -->
+                            <g transform="translate(35, 80)">
+                                <!-- Pillars -->
+                                <rect x="5" y="5" width="6" height="30" fill="#e94560" opacity="0.9" />
+                                <rect x="17" y="5" width="6" height="30" fill="#e94560" opacity="0.9" />
+                                <rect x="29" y="5" width="6" height="30" fill="#e94560" opacity="0.9" />
+                                <rect x="41" y="5" width="6" height="30" fill="#e94560" opacity="0.9" />
+                                <rect x="53" y="5" width="6" height="30" fill="#e94560" opacity="0.9" />
+                                <rect x="65" y="5" width="6" height="30" fill="#e94560" opacity="0.9" />
+                                
+                                <!-- Roof -->
+                                <polygon points="37.5,-8 -2,5 77,5" fill="url(#goldGradient)" filter="url(#glow)" />
+                                <line x1="-2" y1="5" x2="77" y2="5" stroke="#fbbf24" stroke-width="2" />
+                                
+                                <!-- Base -->
+                                <rect x="0" y="35" width="75" height="6" fill="url(#goldGradient)" opacity="0.9" />
+                            </g>
+                            
+                            <!-- Brain Icon -->
+                            <g transform="translate(70, 42)">
+                                <!-- Brain Shape -->
+                                <ellipse cx="0" cy="0" rx="22" ry="18" fill="#f472b6" opacity="0.95" filter="url(#glow)" />
+                                
+                                <!-- Brain Details -->
+                                <path d="M-10,-8 Q-15,-11 -13,-16 Q-10,-18 -5,-16 Q0,-20 5,-16 Q10,-18 13,-16 Q15,-11 10,-8" fill="none" stroke="#fbbf24" stroke-width="2.5" opacity="0.9" filter="url(#glow)" />
+                                
+                                <!-- Neural Connections -->
+                                <circle cx="-8" cy="-3" r="2.5" fill="#fbbf24" opacity="0.95" />
+                                <circle cx="8" cy="-3" r="2.5" fill="#fbbf24" opacity="0.95" />
+                                <circle cx="0" cy="4" r="2.5" fill="#fbbf24" opacity="0.95" />
+                                <circle cx="-4" cy="8" r="1.5" fill="#fcd34d" opacity="0.9" />
+                                <circle cx="4" cy="8" r="1.5" fill="#fcd34d" opacity="0.9" />
+                                
+                                <!-- Connection Lines -->
+                                <line x1="-8" y1="-3" x2="0" y2="4" stroke="#fbbf24" stroke-width="1.5" opacity="0.6" />
+                                <line x1="8" y1="-3" x2="0" y2="4" stroke="#fbbf24" stroke-width="1.5" opacity="0.6" />
+                            </g>
+                            
+                            <!-- Sparkles -->
+                            <circle cx="25" cy="25" r="2" fill="#fbbf24" opacity="0.8">
+                                <animate attributeName="opacity" values="0.3;1;0.3" dur="2s" repeatCount="indefinite" />
+                            </circle>
+                            <circle cx="115" cy="30" r="1.5" fill="#f472b6" opacity="0.8">
+                                <animate attributeName="opacity" values="0.5;1;0.5" dur="1.5s" repeatCount="indefinite" />
+                            </circle>
+                            <circle cx="110" cy="110" r="2" fill="#e94560" opacity="0.8">
+                                <animate attributeName="opacity" values="0.4;1;0.4" dur="1.8s" repeatCount="indefinite" />
+                            </circle>
+                        </svg>
+                    </div>
+                    
+                    <h1 class="text-3xl font-bold gradient-text font-amiri mb-3" id="siteTitle">متحف الفكر</h1>
+                    
+                    <!-- University Name -->
+                    <div class="mb-2">
+                        <p class="text-base font-bold text-yellow-300 mb-1">🎓 جامعة زيان عاشور بالجلفة</p>
+                    </div>
+                    
+                    <p class="text-gray-400 text-sm mb-4" id="welcomeMsg">بوابة الإبداع الفكري الرقمية</p>
+                    
+                    <!-- Credits -->
+                    <div class="glass-card rounded-xl p-4 space-y-2">
+                        <div class="flex items-center justify-center gap-2 text-sm">
+                            <span class="text-pink-300 font-bold">💡 فكرة:</span>
+                            <span class="text-gray-300">شعيب سعاد رشا</span>
+                        </div>
+                        <div class="flex items-center justify-center gap-2 text-sm">
+                            <span class="text-purple-300 font-bold">💻 برمجة:</span>
+                            <span class="text-gray-300">مفضل</span>
+                        </div>
+                    </div>
                 </div>
                 
-                <h1 class="text-3xl font-bold gradient-text font-amiri mb-3">متحف الفكر</h1>
-                <p class="text-gray-400 text-sm mb-4">بوابة الإبداع الفكري الرقمية</p>
-            </div>
-            
-            <!-- Tabs for Authentication Methods -->
-            <div class="flex mb-6 border-b border-white/10">
-                <div class="auth-tab active" onclick="switchAuthTab('traditional')" id="tabTraditional">
-                    <span>👤 دخول تقليدي</span>
-                </div>
-                <div class="auth-tab" onclick="switchAuthTab('email')" id="tabEmail">
-                    <span>📧 بريد إلكتروني</span>
-                </div>
-            </div>
-            
-            <!-- Traditional Login Form -->
-            <div id="traditionalLogin" class="auth-form">
-                <div class="space-y-4">
-                    <div>
-                        <label for="loginName" class="block text-sm text-gray-300 mb-2">اسم المستخدم</label>
-                        <input type="text" id="loginName" class="input-style w-full px-4 py-3 rounded-xl text-white placeholder-gray-400" placeholder="أدخل اسمك">
+                <!-- Tabs for Authentication Methods -->
+                <div class="flex mb-6 border-b border-white/10">
+                    <div class="auth-tab active" onclick="switchAuthTab('traditional')" id="tabTraditional">
+                        <span>👤 دخول تقليدي</span>
                     </div>
-                    
-                    <div>
-                        <label for="loginSpecialty" class="block text-sm text-gray-300 mb-2">التخصص / رمز الترقية (اختياري)</label>
-                        <input type="text" id="loginSpecialty" class="input-style w-full px-4 py-3 rounded-xl text-white placeholder-gray-400" placeholder="أدخل تخصصك أو رمز الترقية">
+                    <div class="auth-tab" onclick="switchAuthTab('email')" id="tabEmail">
+                        <span>📧 بريد إلكتروني</span>
                     </div>
-                    
-                    <button onclick="handleTraditionalLogin()" class="btn-primary w-full py-3 rounded-xl text-white font-bold mt-6">
-                        <span id="traditionalLoginBtnText">🚀 دخول المتحف</span>
-                        <div id="traditionalLoginSpinner" class="loading-spinner hidden mx-auto"></div>
-                    </button>
                 </div>
-            </div>
-            
-            <!-- Email Login/Register Form -->
-            <div id="emailLogin" class="auth-form hidden">
-                <div class="space-y-4">
-                    <div id="emailLoginFields">
-                        <div class="mb-4">
-                            <label for="loginEmail" class="block text-sm text-gray-300 mb-2">البريد الإلكتروني</label>
-                            <input type="email" id="loginEmail" class="input-style w-full px-4 py-3 rounded-xl text-white placeholder-gray-400" placeholder="example@email.com">
+                
+                <!-- Traditional Login Form -->
+                <div id="traditionalLogin" class="auth-form">
+                    <div class="space-y-4">
+                        <div>
+                            <label for="loginName" class="block text-sm text-gray-300 mb-2">اسم المستخدم</label>
+                            <input type="text" id="loginName" class="input-style w-full px-4 py-3 rounded-xl text-white placeholder-gray-400" placeholder="أدخل اسمك">
                         </div>
                         
                         <div>
-                            <label for="loginPassword" class="block text-sm text-gray-300 mb-2">كلمة المرور</label>
-                            <input type="password" id="loginPassword" class="input-style w-full px-4 py-3 rounded-xl text-white placeholder-gray-400" placeholder="أدخل كلمة المرور">
+                            <label for="loginSpecialty" class="block text-sm text-gray-300 mb-2">التخصص / رمز الترقية (اختياري)</label>
+                            <input type="text" id="loginSpecialty" class="input-style w-full px-4 py-3 rounded-xl text-white placeholder-gray-400" placeholder="أدخل تخصصك أو رمز الترقية">
                         </div>
                         
-                        <div class="mt-2 text-right">
-                            <button onclick="toggleEmailMode()" class="text-pink-400 hover:text-pink-300 text-sm">
-                                <span id="emailToggleText">إنشاء حساب جديد</span>
-                            </button>
+                        <button onclick="handleTraditionalLogin()" class="btn-primary w-full py-3 rounded-xl text-white font-bold mt-6">
+                            <span id="traditionalLoginBtnText">🚀 دخول المتحف</span>
+                            <div id="traditionalLoginSpinner" class="loading-spinner hidden mx-auto"></div>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Email Login/Register Form -->
+                <div id="emailLogin" class="auth-form hidden">
+                    <div class="space-y-4">
+                        <div id="emailLoginFields">
+                            <div class="mb-4">
+                                <label for="loginEmail" class="block text-sm text-gray-300 mb-2">البريد الإلكتروني</label>
+                                <input type="email" id="loginEmail" class="input-style w-full px-4 py-3 rounded-xl text-white placeholder-gray-400" placeholder="example@email.com">
+                            </div>
+                            
+                            <div>
+                                <label for="loginPassword" class="block text-sm text-gray-300 mb-2">كلمة المرور</label>
+                                <input type="password" id="loginPassword" class="input-style w-full px-4 py-3 rounded-xl text-white placeholder-gray-400" placeholder="أدخل كلمة المرور">
+                            </div>
+                            
+                            <div class="mt-2 text-right">
+                                <button onclick="toggleEmailMode()" class="text-pink-400 hover:text-pink-300 text-sm">
+                                    <span id="emailToggleText">إنشاء حساب جديد</span>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div id="registerFields" class="hidden">
+                            <div class="mb-4">
+                                <label for="registerName" class="block text-sm text-gray-300 mb-2">اسم المستخدم</label>
+                                <input type="text" id="registerName" class="input-style w-full px-4 py-3 rounded-xl text-white placeholder-gray-400" placeholder="الاسم الذي سيظهر">
+                            </div>
+                            
+                            <div class="mb-4">
+                                <label for="registerSpecialty" class="block text-sm text-gray-300 mb-2">التخصص (اختياري)</label>
+                                <input type="text" id="registerSpecialty" class="input-style w-full px-4 py-3 rounded-xl text-white placeholder-gray-400" placeholder="تخصصك الأكاديمي">
+                            </div>
+                        </div>
+                        
+                        <button onclick="handleEmailAuth()" class="btn-primary w-full py-3 rounded-xl text-white font-bold mt-2">
+                            <span id="emailAuthBtnText">تسجيل الدخول</span>
+                            <div id="emailAuthSpinner" class="loading-spinner hidden mx-auto"></div>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Divider -->
+                <div class="divider mt-6">
+                    <span class="divider-text">أو</span>
+                </div>
+                
+                <!-- Google Sign-In Button -->
+                <button onclick="handleGoogleLogin()" class="btn-google w-full py-3 rounded-xl font-bold mb-4 flex items-center justify-center gap-3">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 48 48">
+                        <path fill="#FFC107" d="M43.611 20.083H42V20H24v8h11.303c-1.649 4.657-6.08 8-11.303 8-6.627 0-12-5.373-12-12s5.373-12 12-12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4 12.955 4 4 12.955 4 24s8.955 20 20 20 20-8.955 20-20c0-1.341-.138-2.65-.389-3.917z"/>
+                        <path fill="#FF3D00" d="m6.306 14.691 6.571 4.819C14.655 15.108 18.961 12 24 12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4 16.318 4 9.656 8.337 6.306 14.691z"/>
+                        <path fill="#4CAF50" d="M24 44c5.166 0 9.86-1.977 13.409-5.192l-6.19-5.238A11.91 11.91 0 0 1 24 36c-5.202 0-9.619-3.317-11.283-7.946l-6.522 5.025C9.505 39.556 16.227 44 24 44z"/>
+                        <path fill="#1976D2" d="M43.611 20.083H42V20H24v8h11.303a12.04 12.04 0 0 1-4.087 5.571l.003-.002 6.19 5.238C36.971 39.205 44 34 44 24c0-1.341-.138-2.65-.389-3.917z"/>
+                    </svg>
+                    <span>تسجيل الدخول بحساب جوجل</span>
+                </button>
+                
+                <!-- Additional Info -->
+                <div class="mt-6 text-center text-sm text-gray-400">
+                    <p>انضم إلى مجتمع المفكرين والمبدعين</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Main App -->
+        <div id="mainApp" class="h-full w-full hidden flex">
+            <!-- Sidebar -->
+            <aside id="sidebar" class="sidebar-mobile w-64 glass-sidebar h-full flex flex-col shrink-0">
+                <div class="p-6 border-b border-white/10">
+                    <div class="flex items-center gap-3">
+                        <span class="text-3xl">🏛️</span>
+                        <div>
+                            <h1 class="text-xl font-bold gradient-text">متحف الفكر</h1>
+                            <p class="text-xs text-gray-400" id="userRoleDisplay">زائر</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <nav class="flex-1 p-4 space-y-2 overflow-auto scrollbar-hide">
+                    <button onclick="navigateTo('home')" class="sidebar-item active w-full flex items-center gap-3 px-4 py-3 rounded-xl text-right" data-page="home">
+                        <span class="text-xl">🏠</span>
+                        <span>الرئيسية</span>
+                    </button>
+                    
+                    <button onclick="navigateTo('ideas')" class="sidebar-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-right" data-page="ideas">
+                        <span class="text-xl">💡</span>
+                        <span>الأفكار</span>
+                    </button>
+                    
+                    <button onclick="navigateTo('content')" class="sidebar-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-right" data-page="content">
+                        <span class="text-xl">📚</span>
+                        <span>المحتوى</span>
+                    </button>
+                    
+                    <button onclick="navigateTo('philosophy')" class="sidebar-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-right" data-page="philosophy">
+                        <span class="text-xl">🧠</span>
+                        <span>الفلسفة</span>
+                    </button>
+                    
+                    <button onclick="navigateTo('quotes')" class="sidebar-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-right" data-page="quotes">
+                        <span class="text-xl">✨</span>
+                        <span>العبارات الملهمة</span>
+                    </button>
+                    
+                    <button onclick="navigateTo('suggestions')" class="sidebar-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-right position-relative" data-page="suggestions">
+                        <span class="text-xl">📝</span>
+                        <span>الاقتراحات</span>
+                        <span id="suggestionsBadge" class="badge text-xs px-2 py-0.5 rounded-full mr-auto hidden">0</span>
+                    </button>
+                    
+                    <button onclick="navigateTo('about')" class="sidebar-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-right" data-page="about">
+                        <span class="text-xl">ℹ️</span>
+                        <span>عن المشروع</span>
+                    </button>
+                    
+                    <div id="adminMenuItems" class="hidden space-y-2">
+                        <div class="border-t border-white/10 my-4 pt-4">
+                            <p class="text-xs text-gray-500 px-4 mb-2">إدارة النظام</p>
+                        </div>
+                        
+                        <button onclick="navigateTo('members')" class="sidebar-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-right" data-page="members">
+                            <span class="text-xl">👥</span>
+                            <span>الأعضاء</span>
+                        </button>
+                        
+                        <button onclick="navigateTo('codes')" class="sidebar-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-right" data-page="codes">
+                            <span class="text-xl">🎫</span>
+                            <span>رموز الدعوة</span>
+                        </button>
+                        
+                        <button onclick="navigateTo('settings')" class="sidebar-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-right" data-page="settings">
+                            <span class="text-xl">⚙️</span>
+                            <span>الإعدادات</span>
+                        </button>
+                    </div>
+                </nav>
+                
+                <div class="p-4 border-t border-white/10">
+                    <div class="glass-card rounded-xl p-3 mb-3">
+                        <div class="flex items-center gap-3">
+                            <div class="w-12 h-12 rounded-full bg-gradient-to-br from-pink-500 to-orange-500 flex items-center justify-center text-2xl shadow-lg avatar-pulse">
+                                <span id="userAvatar">👤</span>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <p class="font-bold text-sm truncate" id="currentUserName">المستخدم</p>
+                                <p class="text-xs text-gray-400 truncate" id="currentUserSpecialty">التخصص</p>
+                            </div>
                         </div>
                     </div>
                     
-                    <div id="registerFields" class="hidden">
-                        <div class="mb-4">
-                            <label for="registerName" class="block text-sm text-gray-300 mb-2">اسم المستخدم</label>
-                            <input type="text" id="registerName" class="input-style w-full px-4 py-3 rounded-xl text-white placeholder-gray-400" placeholder="الاسم الذي سيظهر">
-                        </div>
-                        
-                        <div class="mb-4">
-                            <label for="registerSpecialty" class="block text-sm text-gray-300 mb-2">التخصص (اختياري)</label>
-                            <input type="text" id="registerSpecialty" class="input-style w-full px-4 py-3 rounded-xl text-white placeholder-gray-400" placeholder="تخصصك الأكاديمي">
-                        </div>
-                    </div>
-                    
-                    <button onclick="handleEmailAuth()" class="btn-primary w-full py-3 rounded-xl text-white font-bold mt-2">
-                        <span id="emailAuthBtnText">تسجيل الدخول</span>
-                        <div id="emailAuthSpinner" class="loading-spinner hidden mx-auto"></div>
+                    <button onclick="handleLogout()" class="btn-secondary w-full py-2 rounded-xl text-sm flex items-center justify-center gap-2">
+                        <span>🚪</span>
+                        <span>تسجيل الخروج</span>
                     </button>
                 </div>
-            </div>
+            </aside>
             
-            <!-- Divider -->
-            <div class="divider mt-6">
-                <span class="divider-text">أو</span>
-            </div>
-            
-            <!-- Google Sign-In Button -->
-            <button onclick="handleGoogleLogin()" class="btn-google w-full py-3 rounded-xl font-bold mb-4 flex items-center justify-center gap-3">
-                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 48 48">
-                    <path fill="#FFC107" d="M43.611 20.083H42V20H24v8h11.303c-1.649 4.657-6.08 8-11.303 8-6.627 0-12-5.373-12-12s5.373-12 12-12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4 12.955 4 4 12.955 4 24s8.955 20 20 20 20-8.955 20-20c0-1.341-.138-2.65-.389-3.917z"/>
-                    <path fill="#FF3D00" d="m6.306 14.691 6.571 4.819C14.655 15.108 18.961 12 24 12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4 16.318 4 9.656 8.337 6.306 14.691z"/>
-                    <path fill="#4CAF50" d="M24 44c5.166 0 9.86-1.977 13.409-5.192l-6.19-5.238A11.91 11.91 0 0 1 24 36c-5.202 0-9.619-3.317-11.283-7.946l-6.522 5.025C9.505 39.556 16.227 44 24 44z"/>
-                    <path fill="#1976D2" d="M43.611 20.083H42V20H24v8h11.303a12.04 12.04 0 0 1-4.087 5.571l.003-.002 6.19 5.238C36.971 39.205 44 34 44 24c0-1.341-.138-2.65-.389-3.917z"/>
-                </svg>
-                <span>تسجيل الدخول بحساب جوجل</span>
-            </button>
-            
-            <!-- Additional Info -->
-            <div class="mt-6 text-center text-sm text-gray-400">
-                <p>انضم إلى مجتمع المفكرين والمبدعين</p>
-                <div class="glass-card rounded-xl p-4 mt-4 space-y-2">
-                    <div class="flex items-center justify-center gap-2 text-sm">
-                        <span class="text-pink-300 font-bold">💡 فكرة:</span>
-                        <span class="text-gray-300">شعيب سعاد رشا</span>
+            <!-- Main Content -->
+            <main class="flex-1 overflow-auto p-6" id="mainContent">
+                <!-- Home Page -->
+                <div id="homePage" class="page-content animate-fade-in">
+                    <div class="mb-8">
+                        <h2 class="text-3xl font-bold mb-2">مرحباً، <span id="welcomeName">المستخدم</span> 👋</h2>
+                        <p class="text-gray-400">اكتشف عالم الأفكار والإبداع</p>
                     </div>
-                    <div class="flex items-center justify-center gap-2 text-sm">
-                        <span class="text-purple-300 font-bold">💻 برمجة:</span>
-                        <span class="text-gray-300">مفضل</span>
+                    
+                    <!-- Stats -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+                        <div class="stat-card glass-card rounded-2xl p-5 card-hover">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-gray-400 text-sm">إجمالي الأفكار</p>
+                                    <p class="text-3xl font-bold mt-1" id="totalIdeas">0</p>
+                                </div>
+                                <span class="text-4xl">💡</span>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card glass-card rounded-2xl p-5 card-hover">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-gray-400 text-sm">إجمالي المشاهدات</p>
+                                    <p class="text-3xl font-bold mt-1" id="totalViews">0</p>
+                                </div>
+                                <span class="text-4xl">👁️</span>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card glass-card rounded-2xl p-5 card-hover">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-gray-400 text-sm">الأعضاء</p>
+                                    <p class="text-3xl font-bold mt-1" id="totalMembers">0</p>
+                                </div>
+                                <span class="text-4xl">👥</span>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card glass-card rounded-2xl p-5 card-hover">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-gray-400 text-sm">التفاعلات</p>
+                                    <p class="text-3xl font-bold mt-1" id="totalInteractions">0</p>
+                                </div>
+                                <span class="text-4xl">❤️</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Quote of the Day -->
+                    <div class="quote-card glass-card rounded-2xl p-6 mb-8">
+                        <div class="flex items-start gap-4">
+                            <span class="text-4xl">💭</span>
+                            <div>
+                                <h3 class="text-lg font-bold mb-2 text-pink-300">عبارة اليوم</h3>
+                                <p class="text-xl font-amiri leading-relaxed" id="quoteOfDay">"الفكرة هي البذرة، والعقل هو التربة، والإبداع هو الثمرة"</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Latest Ideas -->
+                    <div class="mb-8">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-xl font-bold">أحدث الأفكار</h3>
+                            <button onclick="navigateTo('ideas')" class="text-pink-400 hover:text-pink-300 text-sm">عرض الكل ←</button>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="latestIdeasGrid">
+                            <div class="glass-card rounded-xl p-6 text-center text-gray-400">
+                                <p>لا توجد أفكار حتى الآن</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </div>
+                
+                <!-- Ideas Page -->
+                <div id="ideasPage" class="page-content hidden animate-fade-in">
+                    <div class="flex items-center justify-between mb-6 flex-wrap gap-4">
+                        <div>
+                            <h2 class="text-3xl font-bold">💡 معرض الأفكار</h2>
+                            <p class="text-gray-400 mt-1">استكشف أفكار المبدعين</p>
+                        </div>
+                        <button id="addIdeaBtn" onclick="openAddIdeaModal()" class="btn-primary px-6 py-3 rounded-xl flex items-center gap-2 hidden">
+                            <span>➕</span>
+                            <span>إضافة فكرة</span>
+                        </button>
+                    </div>
+                    
+                    <!-- Filters -->
+                    <div class="flex flex-wrap gap-2 mb-6">
+                        <button onclick="filterIdeas('all')" class="filter-btn active category-tag px-4 py-2 rounded-full text-sm" data-filter="all">الكل</button>
+                        <button onclick="filterIdeas('فلسفة')" class="filter-btn category-tag px-4 py-2 rounded-full text-sm" data-filter="فلسفة">🧠 فلسفة</button>
+                        <button onclick="filterIdeas('تقنية')" class="filter-btn category-tag px-4 py-2 rounded-full text-sm" data-filter="تقنية">💻 تقنية</button>
+                        <button onclick="filterIdeas('أدب')" class="filter-btn category-tag px-4 py-2 rounded-full text-sm" data-filter="أدب">📖 أدب</button>
+                        <button onclick="filterIdeas('علوم')" class="filter-btn category-tag px-4 py-2 rounded-full text-sm" data-filter="علوم">🔬 علوم</button>
+                        <button onclick="filterIdeas('فن')" class="filter-btn category-tag px-4 py-2 rounded-full text-sm" data-filter="فن">🎨 فن</button>
+                        <button onclick="filterIdeas('اجتماع')" class="filter-btn category-tag px-4 py-2 rounded-full text-sm" data-filter="اجتماع">👥 اجتماع</button>
+                    </div>
+                    
+                    <!-- Ideas Grid -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="ideasGrid">
+                        <div class="glass-card rounded-xl p-6 text-center text-gray-400 col-span-full">
+                            <p class="text-5xl mb-4">💭</p>
+                            <p>لا توجد أفكار حتى الآن</p>
+                            <p class="text-sm mt-2">كن أول من يشارك فكرة!</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Content Page -->
+                <div id="contentPage" class="page-content hidden animate-fade-in">
+                    <div class="flex items-center justify-between mb-6 flex-wrap gap-4">
+                        <div>
+                            <h2 class="text-3xl font-bold">📚 المحتوى الفكري</h2>
+                            <p class="text-gray-400 mt-1">مقالات ونصوص ملهمة</p>
+                        </div>
+                        <button id="addContentBtn" onclick="openAddContentModal()" class="btn-primary px-6 py-3 rounded-xl flex items-center gap-2 hidden">
+                            <span>➕</span>
+                            <span>إضافة محتوى</span>
+                        </button>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6" id="contentGrid">
+                        <div class="glass-card rounded-xl p-6 text-center text-gray-400">
+                            <p>لا يوجد محتوى حتى الآن</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Philosophy Page -->
+                <div id="philosophyPage" class="page-content hidden animate-fade-in">
+                    <div class="mb-6">
+                        <h2 class="text-3xl font-bold">🧠 تأملات فلسفية</h2>
+                        <p class="text-gray-400 mt-1">أسئلة عميقة وتأملات في الوجود</p>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="philosophyGrid">
+                        <div class="glass-card rounded-2xl p-6 card-hover border-r-4 border-purple-500">
+                            <h3 class="text-xl font-bold mb-3 text-purple-300">ما هي الفكرة؟</h3>
+                            <p class="text-gray-300 leading-relaxed">الفكرة هي نواة التغيير، شرارة تضيء العقل وتفتح أبواب الإبداع. إنها البذرة التي تُزرع في تربة الوعي، لتنمو وتثمر إنجازات عظيمة. كل حضارة قامت على فكرة، وكل اختراع بدأ بخاطرة. الفكرة هي القوة الخفية التي تشكل واقعنا وترسم مستقبلنا.</p>
+                        </div>
+                        
+                        <div class="glass-card rounded-2xl p-6 card-hover border-r-4 border-indigo-500">
+                            <h3 class="text-xl font-bold mb-3 text-indigo-300">الحرية والمسؤولية</h3>
+                            <p class="text-gray-300 leading-relaxed">حرية الفكر هي أسمى أنواع الحرية، لكنها تحمل معها مسؤولية أخلاقية. فالعقل الحر قادر على تشكيل الواقع، لكنه مُطالب بأن يكون واعياً بتأثيره. الحرية بدون مسؤولية فوضى، والمسؤولية بدون حرية قيد. التوازن بينهما هو جوهر النضج الفكري.</p>
+                        </div>
+                        
+                        <div class="glass-card rounded-2xl p-6 card-hover border-r-4 border-pink-500">
+                            <h3 class="text-xl font-bold mb-3 text-pink-300">الفكر والواقع</h3>
+                            <p class="text-gray-300 leading-relaxed">هل الفكر يشكل الواقع أم الواقع يشكل الفكر؟ جدلية قديمة تكشف عن علاقة متبادلة عميقة. أفكارنا تبني واقعنا، وواقعنا يلهم أفكارنا. إنها دائرة مستمرة من التأثير والتأثر، حيث يصبح التفكير الواعي أداة لتحويل الواقع نحو الأفضل.</p>
+                        </div>
+                        
+                        <div class="glass-card rounded-2xl p-6 card-hover border-r-4 border-orange-500">
+                            <h3 class="text-xl font-bold mb-3 text-orange-300">قيمة الصمت</h3>
+                            <p class="text-gray-300 leading-relaxed">في عالم مليء بالضجيج والمعلومات المتدفقة، يصبح الصمت ضرورة فكرية. الصمت ليس غياباً للصوت، بل حضور للوعي. إنه المساحة التي يحتاجها العقل ليعيد ترتيب أفكاره، ليتأمل، ليبدع. في الصمت تولد الأفكار العظيمة، وفي الهدوء تتضح الرؤى.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Quotes Page -->
+                <div id="quotesPage" class="page-content hidden animate-fade-in">
+                    <div class="mb-6">
+                        <h2 class="text-3xl font-bold">✨ العبارات الملهمة</h2>
+                        <p class="text-gray-400 mt-1">كلمات تلهم وتحفز</p>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="quotesGrid">
+                        <!-- Quotes will be rendered here -->
+                    </div>
+                </div>
+                
+                <!-- Suggestions Page -->
+                <div id="suggestionsPage" class="page-content hidden animate-fade-in">
+                    <div class="mb-6">
+                        <h2 class="text-3xl font-bold">📝 صندوق الاقتراحات</h2>
+                        <p class="text-gray-400 mt-1">شاركنا أفكارك لتطوير المتحف</p>
+                    </div>
+                    
+                    <!-- Add Suggestion Form -->
+                    <div class="glass-card rounded-2xl p-6 mb-8">
+                        <h3 class="text-lg font-bold mb-4">إرسال اقتراح جديد</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                            <div>
+                                <label for="suggestionType" class="block text-sm text-gray-300 mb-2">نوع الاقتراح</label>
+                                <select id="suggestionType" class="input-style w-full px-4 py-3 rounded-xl text-white">
+                                    <option value="تصميم">🎨 تصميم</option>
+                                    <option value="محتوى">📚 محتوى</option>
+                                    <option value="ميزات">⚡ ميزات جديدة</option>
+                                    <option value="تحسينات">🔧 تحسينات</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="suggestionTitle" class="block text-sm text-gray-300 mb-2">عنوان الاقتراح</label>
+                                <input type="text" id="suggestionTitle" class="input-style w-full px-4 py-3 rounded-xl text-white placeholder-gray-400" placeholder="عنوان موجز">
+                            </div>
+                        </div>
+                        <div class="mb-4">
+                            <label for="suggestionContent" class="block text-sm text-gray-300 mb-2">تفاصيل الاقتراح</label>
+                            <textarea id="suggestionContent" class="input-style w-full px-4 py-3 rounded-xl text-white placeholder-gray-400 h-32 resize-none" placeholder="اشرح اقتراحك بالتفصيل..."></textarea>
+                        </div>
+                        <button onclick="submitSuggestion()" class="btn-primary px-6 py-3 rounded-xl">
+                            <span id="submitSuggestionText">إرسال الاقتراح</span>
+                            <div id="submitSuggestionSpinner" class="loading-spinner hidden mx-auto"></div>
+                        </button>
+                    </div>
+                    
+                    <!-- Suggestions List -->
+                    <div id="suggestionsList" class="space-y-4">
+                        <div class="glass-card rounded-xl p-6 text-center text-gray-400">
+                            <p>لا توجد اقتراحات حتى الآن</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- About Page -->
+                <div id="aboutPage" class="page-content hidden animate-fade-in">
+                    <div class="mb-8">
+                        <h2 class="text-3xl font-bold mb-2">ℹ️ عن المشروع</h2>
+                        <p class="text-gray-400">معلومات حول متحف الفكر</p>
+                    </div>
+                    
+                    <!-- Logo Section -->
+                    <div class="glass-card rounded-2xl p-8 mb-6 text-center">
+                        <div class="flex justify-center mb-6">
+                            <svg width="160" height="160" viewbox="0 0 140 140" xmlns="http://www.w3.org/2000/svg" class="logo-glow">
+                                <!-- Same logo as login -->
+                                <defs>
+                                    <linearGradient id="aboutLogoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                        <stop offset="0%" style="stop-color:#0f172a;stop-opacity:1" />
+                                        <stop offset="30%" style="stop-color:#e94560;stop-opacity:0.9" />
+                                        <stop offset="70%" style="stop-color:#f472b6;stop-opacity:0.9" />
+                                        <stop offset="100%" style="stop-color:#fbbf24;stop-opacity:1" />
+                                    </linearGradient>
+                                    <linearGradient id="aboutGoldGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                                        <stop offset="0%" style="stop-color:#fbbf24;stop-opacity:1" />
+                                        <stop offset="50%" style="stop-color:#fcd34d;stop-opacity:1" />
+                                        <stop offset="100%" style="stop-color:#fbbf24;stop-opacity:1" />
+                                    </linearGradient>
+                                    <filter id="aboutGlow">
+                                        <feGaussianBlur stdDeviation="2" result="coloredBlur" />
+                                        <feMerge>
+                                            <feMergeNode in="coloredBlur" />
+                                            <feMergeNode in="SourceGraphic" />
+                                        </feMerge>
+                                    </filter>
+                                    <radialGradient id="aboutGlassGradient">
+                                        <stop offset="0%" style="stop-color:#ffffff;stop-opacity:0.3" />
+                                        <stop offset="100%" style="stop-color:#ffffff;stop-opacity:0.05" />
+                                    </radialGradient>
+                                </defs>
+                                <circle cx="70" cy="70" r="65" fill="none" stroke="url(#aboutLogoGradient)" stroke-width="1.5" opacity="0.4" />
+                                <circle cx="70" cy="70" r="58" fill="url(#aboutGlassGradient)" filter="url(#aboutGlow)" />
+                                <circle cx="70" cy="70" r="58" fill="none" stroke="url(#aboutLogoGradient)" stroke-width="3" />
+                                <g transform="translate(35, 80)">
+                                    <rect x="5" y="5" width="6" height="30" fill="#e94560" opacity="0.9" />
+                                    <rect x="17" y="5" width="6" height="30" fill="#e94560" opacity="0.9" />
+                                    <rect x="29" y="5" width="6" height="30" fill="#e94560" opacity="0.9" />
+                                    <rect x="41" y="5" width="6" height="30" fill="#e94560" opacity="0.9" />
+                                    <rect x="53" y="5" width="6" height="30" fill="#e94560" opacity="0.9" />
+                                    <rect x="65" y="5" width="6" height="30" fill="#e94560" opacity="0.9" />
+                                    <polygon points="37.5,-8 -2,5 77,5" fill="url(#aboutGoldGradient)" filter="url(#aboutGlow)" />
+                                    <line x1="-2" y1="5" x2="77" y2="5" stroke="#fbbf24" stroke-width="2" />
+                                    <rect x="0" y="35" width="75" height="6" fill="url(#aboutGoldGradient)" opacity="0.9" />
+                                </g>
+                                <g transform="translate(70, 42)">
+                                    <ellipse cx="0" cy="0" rx="22" ry="18" fill="#f472b6" opacity="0.95" filter="url(#aboutGlow)" />
+                                    <path d="M-10,-8 Q-15,-11 -13,-16 Q-10,-18 -5,-16 Q0,-20 5,-16 Q10,-18 13,-16 Q15,-11 10,-8" fill="none" stroke="#fbbf24" stroke-width="2.5" opacity="0.9" filter="url(#aboutGlow)" />
+                                    <circle cx="-8" cy="-3" r="2.5" fill="#fbbf24" opacity="0.95" />
+                                    <circle cx="8" cy="-3" r="2.5" fill="#fbbf24" opacity="0.95" />
+                                    <circle cx="0" cy="4" r="2.5" fill="#fbbf24" opacity="0.95" />
+                                    <circle cx="-4" cy="8" r="1.5" fill="#fcd34d" opacity="0.9" />
+                                    <circle cx="4" cy="8" r="1.5" fill="#fcd34d" opacity="0.9" />
+                                    <line x1="-8" y1="-3" x2="0" y2="4" stroke="#fbbf24" stroke-width="1.5" opacity="0.6" />
+                                    <line x1="8" y1="-3" x2="0" y2="4" stroke="#fbbf24" stroke-width="1.5" opacity="0.6" />
+                                </g>
+                                <circle cx="25" cy="25" r="2" fill="#fbbf24" opacity="0.8">
+                                    <animate attributeName="opacity" values="0.3;1;0.3" dur="2s" repeatCount="indefinite" />
+                                </circle>
+                                <circle cx="115" cy="30" r="1.5" fill="#f472b6" opacity="0.8">
+                                    <animate attributeName="opacity" values="0.5;1;0.5" dur="1.5s" repeatCount="indefinite" />
+                                </circle>
+                                <circle cx="110" cy="110" r="2" fill="#e94560" opacity="0.8">
+                                    <animate attributeName="opacity" values="0.4;1;0.4" dur="1.8s" repeatCount="indefinite" />
+                                </circle>
+                            </svg>
+                        </div>
+                        <h1 class="text-4xl font-bold gradient-text font-amiri mb-4">متحف الفكر</h1>
+                        <p class="text-xl text-gray-300 mb-2">بوابة الإبداع الفكري الرقمية</p>
+                        <p class="text-gray-400">منصة لتبادل الأفكار والإبداع الفكري</p>
+                    </div>
+                    
+                    <!-- University Section -->
+                    <div class="glass-card rounded-2xl p-6 mb-6">
+                        <div class="flex items-center gap-4 mb-4">
+                            <span class="text-5xl">🎓</span>
+                            <div>
+                                <h3 class="text-2xl font-bold text-yellow-300">جامعة زيان عاشور بالجلفة</h3>
+                                <p class="text-gray-400">مؤسسة تعليمية عريقة</p>
+                            </div>
+                        </div>
+                        <p class="text-gray-300 leading-relaxed">تسعى جامعة زيان عاشور بالجلفة إلى تقديم تعليم نوعي وتشجيع البحث العلمي والابتكار. هذا المشروع يمثل رؤية الجامعة في دعم الطلاب والمبدعين وتوفير منصات رقمية حديثة لتبادل المعرفة والأفكار.</p>
+                    </div>
+                    
+                    <!-- Credits Grid -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Idea -->
+                        <div class="glass-card rounded-2xl p-6 border-r-4 border-pink-500">
+                            <div class="flex items-center gap-3 mb-4">
+                                <span class="text-4xl">💡</span>
+                                <h3 class="text-xl font-bold text-pink-300">فكرة المشروع</h3>
+                            </div>
+                            <p class="text-2xl font-bold mb-2">شعيب سعاد رشا</p>
+                            <p class="text-gray-400">صاحبة الفكرة الأصلية لمتحف الفكر. رؤية إبداعية لإنشاء فضاء رقمي يجمع المبدعين والمفكرين في منصة واحدة لتبادل الأفكار والإلهام.</p>
+                        </div>
+                        
+                        <!-- Programming -->
+                        <div class="glass-card rounded-2xl p-6 border-r-4 border-purple-500">
+                            <div class="flex items-center gap-3 mb-4">
+                                <span class="text-4xl">💻</span>
+                                <h3 class="text-xl font-bold text-purple-300">التطوير والبرمجة</h3>
+                            </div>
+                            <p class="text-2xl font-bold mb-2">مفضل</p>
+                            <p class="text-gray-400">المطور المسؤول عن تحويل الفكرة إلى واقع رقمي. تصميم وبرمجة المنصة بتقنيات حديثة لتوفير تجربة مستخدم سلسة وجميلة.</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Features -->
+                    <div class="glass-card rounded-2xl p-6 mt-6">
+                        <h3 class="text-xl font-bold mb-4 flex items-center gap-2">
+                            <span>⚡</span>
+                            <span>مميزات المنصة</span>
+                        </h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="flex items-start gap-3">
+                                <span class="text-2xl">💡</span>
+                                <div>
+                                    <p class="font-bold text-pink-300">معرض الأفكار</p>
+                                    <p class="text-sm text-gray-400">منصة لمشاركة واستكشاف الأفكار الإبداعية</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start gap-3">
+                                <span class="text-2xl">📚</span>
+                                <div>
+                                    <p class="font-bold text-pink-300">المحتوى الفكري</p>
+                                    <p class="text-sm text-gray-400">مقالات ونصوص ملهمة من المبدعين</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start gap-3">
+                                <span class="text-2xl">🧠</span>
+                                <div>
+                                    <p class="font-bold text-pink-300">التأملات الفلسفية</p>
+                                    <p class="text-sm text-gray-400">أسئلة عميقة وتأملات في الوجود</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start gap-3">
+                                <span class="text-2xl">💾</span>
+                                <div>
+                                    <p class="font-bold text-pink-300">قاعدة بيانات متكاملة</p>
+                                    <p class="text-sm text-gray-400">حفظ تلقائي لجميع البيانات والتفاعلات</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start gap-3">
+                                <span class="text-2xl">🎨</span>
+                                <div>
+                                    <p class="font-bold text-pink-300">تصميم عصري</p>
+                                    <p class="text-sm text-gray-400">واجهة جميلة بتأثيرات Glassmorphism</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start gap-3">
+                                <span class="text-2xl">📱</span>
+                                <div>
+                                    <p class="font-bold text-pink-300">متجاوب كلياً</p>
+                                    <p class="text-sm text-gray-400">يعمل على جميع الأجهزة بسلاسة</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Version -->
+                    <div class="text-center mt-8 text-gray-500 text-sm">
+                        <p>الإصدار 1.0 | 2025 © جميع الحقوق محفوظة</p>
+                        <p class="mt-1">صُنع بـ ❤️ في جامعة زيان عاشور بالجلفة</p>
+                    </div>
+                </div>
+                
+                <!-- Members Page (Admin Only) -->
+                <div id="membersPage" class="page-content hidden animate-fade-in">
+                    <div class="mb-6">
+                        <h2 class="text-3xl font-bold">👥 إدارة الأعضاء</h2>
+                        <p class="text-gray-400 mt-1">قائمة جميع الأعضاء المسجلين</p>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 gap-6">
+                        <!-- Admins -->
+                        <div class="glass-card rounded-2xl p-6">
+                            <h3 class="text-xl font-bold mb-4 flex items-center gap-2">
+                                <span>👑</span>
+                                <span>المدراء</span>
+                            </h3>
+                            <div id="adminMembersList" class="space-y-3">
+                                <p class="text-gray-400 text-center">لا يوجد مدراء</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Premium Members -->
+                        <div class="glass-card rounded-2xl p-6">
+                            <h3 class="text-xl font-bold mb-4 flex items-center gap-2">
+                                <span>💡</span>
+                                <span>الأعضاء المميزون</span>
+                            </h3>
+                            <div id="premiumMembersList" class="space-y-3">
+                                <p class="text-gray-400 text-center">لا يوجد أعضاء مميزون</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Regular Members -->
+                        <div class="glass-card rounded-2xl p-6">
+                            <h3 class="text-xl font-bold mb-4 flex items-center gap-2">
+                                <span>👤</span>
+                                <span>الأعضاء العاديون</span>
+                            </h3>
+                            <div id="regularMembersList" class="space-y-3">
+                                <p class="text-gray-400 text-center">لا يوجد أعضاء</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Codes Page (Admin Only) -->
+                <div id="codesPage" class="page-content hidden animate-fade-in">
+                    <div class="mb-6">
+                        <h2 class="text-3xl font-bold">🎫 رموز الدعوة والترقية</h2>
+                        <p class="text-gray-400 mt-1">إنشاء وإدارة رموز الترقية</p>
+                    </div>
+                    
+                    <!-- Create Code -->
+                    <div class="glass-card rounded-2xl p-6 mb-8">
+                        <h3 class="text-lg font-bold mb-4">إنشاء رمز جديد</h3>
+                        <div class="flex flex-wrap gap-4">
+                            <input type="text" id="newCodeInput" class="input-style flex-1 px-4 py-3 rounded-xl text-white placeholder-gray-400" placeholder="أدخل الرمز أو اتركه فارغاً للتوليد التلقائي">
+                            <button onclick="generateCode()" class="btn-primary px-6 py-3 rounded-xl">إنشاء رمز</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Codes List -->
+                    <div class="glass-card rounded-2xl p-6">
+                        <h3 class="text-lg font-bold mb-4">الرموز الموجودة</h3>
+                        <div id="codesList" class="space-y-3">
+                            <p class="text-gray-400 text-center">لا توجد رموز</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Settings Page (Admin Only) -->
+                <div id="settingsPage" class="page-content hidden animate-fade-in">
+                    <div class="mb-6">
+                        <h2 class="text-3xl font-bold">⚙️ إعدادات النظام</h2>
+                        <p class="text-gray-400 mt-1">إدارة وتهيئة المتحف</p>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div class="glass-card rounded-2xl p-6">
+                            <h3 class="text-xl font-bold mb-4">📊 إحصائيات النظام</h3>
+                            <div class="space-y-3">
+                                <div class="flex justify-between items-center py-2 border-b border-white/10">
+                                    <span class="text-gray-400">إجمالي الأفكار</span>
+                                    <span class="font-bold" id="settingsIdeasCount">0</span>
+                                </div>
+                                <div class="flex justify-between items-center py-2 border-b border-white/10">
+                                    <span class="text-gray-400">إجمالي الأعضاء</span>
+                                    <span class="font-bold" id="settingsMembersCount">0</span>
+                                </div>
+                                <div class="flex justify-between items-center py-2 border-b border-white/10">
+                                    <span class="text-gray-400">الاقتراحات المعلقة</span>
+                                    <span class="font-bold" id="settingsSuggestionsCount">0</span>
+                                </div>
+                                <div class="flex justify-between items-center py-2">
+                                    <span class="text-gray-400">رموز الترقية النشطة</span>
+                                    <span class="font-bold" id="settingsCodesCount">0</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="glass-card rounded-2xl p-6">
+                            <h3 class="text-xl font-bold mb-4">🛠️ أدوات الإدارة</h3>
+                            <div class="space-y-4">
+                                <button onclick="exportData()" class="btn-secondary w-full py-3 rounded-xl flex items-center justify-center gap-2">
+                                    <span>📥</span>
+                                    <span>تصدير البيانات</span>
+                                </button>
+                                <button onclick="confirmClearData()" class="w-full py-3 rounded-xl bg-red-500/20 border border-red-500/50 text-red-300 hover:bg-red-500/30 transition-all flex items-center justify-center gap-2">
+                                    <span>🗑️</span>
+                                    <span>حذف جميع البيانات</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
         </div>
     </div>
     
@@ -371,7 +1195,7 @@
 
     <script>
         // ============================================
-        // Firebase Configuration - مضافة هنا بالكامل
+        // Firebase Configuration
         // ============================================
         const firebaseConfig = {
             apiKey: "AIzaSyAVp26636YGOwPIT8X6kWsxKWEnta3A0G4",
@@ -403,12 +1227,43 @@
             codes: []
         };
         let currentUser = null;
+        let currentPage = 'home';
+        let currentFilter = 'all';
+        let confirmAction = null;
+        let viewedIdeas = new Set();
 
         // Admin Credentials
         const ADMINS = [
             { name: 'Rasha', specialty: '20250929' },
             { name: 'MUF', specialty: 'CS' }
         ];
+
+        // Inspirational Quotes
+        const QUOTES = [
+            { text: "العقل كالمظلة، لا يعمل إلا إذا كان مفتوحاً", author: "حكمة شعبية" },
+            { text: "أنا أفكر، إذن أنا موجود", author: "رينيه ديكارت" },
+            { text: "الخيال أهم من المعرفة، فالمعرفة محدودة أما الخيال فيحيط بالعالم", author: "ألبرت أينشتاين" },
+            { text: "القراءة تمنح الإنسان حيوات متعددة في حياة واحدة", author: "من حكم الأدب" },
+            { text: "الفكرة التي لا تتحول إلى فعل، ليست أكثر من حلم", author: "حكمة عملية" },
+            { text: "المعرفة قوة، ولكن التطبيق هو السلطان", author: "فرانسيس بيكون" },
+            { text: "النجاح ليس نهاية، والفشل ليس قاتلاً، إنها الشجاعة على الاستمرار هي التي تحسب", author: "ونستون تشرشل" },
+            { text: "التغيير يبدأ من الداخل، وينمو نحو الخارج", author: "من حكم التطور الذاتي" },
+            { text: "كن كالماء، مرناً وقوياً في آن واحد", author: "بروس لي" },
+            { text: "الإبداع هو الذكاء وهو يستمتع", author: "ألبرت أينشتاين" },
+            { text: "الحياة إما مغامرة جريئة أو لا شيء", author: "هيلين كيلر" },
+            { text: "القمة ليست الهدف، بل الرحلة إليها", author: "من حكم المسافرين" },
+            { text: "الفكرة هي البذرة، والعقل هو التربة، والإبداع هو الثمرة", author: "من حكم متحف الفكر" }
+        ];
+
+        // Category Icons
+        const CATEGORY_ICONS = {
+            'فلسفة': '🧠',
+            'تقنية': '💻',
+            'أدب': '📖',
+            'علوم': '🔬',
+            'فن': '🎨',
+            'اجتماع': '👥'
+        };
 
         // Initialize App
         async function initApp() {
@@ -434,6 +1289,22 @@
 
                 // Render quotes
                 renderQuotes();
+
+                // Show menu toggle on mobile
+                if (window.innerWidth < 769) {
+                    document.getElementById('menuToggle').classList.remove('hidden');
+                }
+
+                // Handle window resize
+                window.addEventListener('resize', () => {
+                    if (window.innerWidth < 769) {
+                        document.getElementById('menuToggle').classList.remove('hidden');
+                    } else {
+                        document.getElementById('menuToggle').classList.add('hidden');
+                        document.getElementById('sidebar').classList.remove('sidebar-open');
+                        document.getElementById('sidebarOverlay').classList.remove('active');
+                    }
+                });
 
             } catch (error) {
                 console.error('Error initializing app:', error);
@@ -799,6 +1670,7 @@
 
                 // Set up real-time listeners
                 setupRealtimeListeners();
+                updateUI();
 
             } catch (error) {
                 console.error('Error loading data:', error);
@@ -811,39 +1683,58 @@
             // Listen for users changes
             db.collection('users').onSnapshot((snapshot) => {
                 appData.users = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                updateUI();
+                if (currentPage === 'members' || currentPage === 'home' || currentPage === 'settings') {
+                    updateUI();
+                }
             });
 
             // Listen for ideas changes
             db.collection('ideas').onSnapshot((snapshot) => {
                 appData.ideas = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                updateUI();
+                if (currentPage === 'ideas' || currentPage === 'home' || currentPage === 'settings') {
+                    updateUI();
+                }
             });
 
             // Listen for content changes
             db.collection('content').onSnapshot((snapshot) => {
                 appData.content = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                updateUI();
+                if (currentPage === 'content') {
+                    updateUI();
+                }
             });
 
             // Listen for suggestions changes
             db.collection('suggestions').onSnapshot((snapshot) => {
                 appData.suggestions = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                updateUI();
+                if (currentPage === 'suggestions' || currentPage === 'home' || currentPage === 'settings') {
+                    updateUI();
+                }
             });
 
             // Listen for codes changes
             db.collection('codes').onSnapshot((snapshot) => {
                 appData.codes = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                updateUI();
+                if (currentPage === 'codes' || currentPage === 'settings') {
+                    updateUI();
+                }
             });
+        }
+
+        // Toggle Sidebar (Mobile)
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            
+            sidebar.classList.toggle('sidebar-open');
+            overlay.classList.toggle('active');
         }
 
         // Logout Handler
         async function handleLogout() {
             try {
                 // Sign out from Firebase if using email/google auth
-                if (currentUser.authMethod === 'email' || currentUser.authMethod === 'google.com') {
+                if (currentUser && (currentUser.authMethod === 'email' || currentUser.authMethod === 'google.com')) {
                     await auth.signOut();
                 }
                 
@@ -873,50 +1764,652 @@
         // Show Main App
         function showMainApp() {
             document.getElementById('loginScreen').classList.add('hidden');
+            document.getElementById('mainApp').classList.remove('hidden');
             
-            // Create main app if it doesn't exist
-            if (!document.getElementById('mainApp')) {
-                // We would need to create the main app structure here
-                // For now, just show a simple message
-                const mainAppHTML = `
-                    <div id="mainApp" class="h-full w-full flex flex-col items-center justify-center p-8">
-                        <div class="glass-card rounded-3xl p-8 max-w-md text-center">
-                            <h2 class="text-2xl font-bold mb-4">مرحباً ${currentUser.name}!</h2>
-                            <p class="text-gray-400 mb-4">تم تسجيل الدخول بنجاح باستخدام ${getAuthMethodName(currentUser.authMethod)}</p>
-                            <p class="mb-2">📧 البريد: ${currentUser.email || 'غير محدد'}</p>
-                            <p class="mb-2">🎯 الدور: ${currentUser.role}</p>
-                            <p class="mb-6">🔐 طريقة الدخول: ${getAuthMethodName(currentUser.authMethod)}</p>
-                            <button onclick="handleLogout()" class="btn-primary px-6 py-3 rounded-xl">
-                                تسجيل الخروج
-                            </button>
-                        </div>
-                    </div>
-                `;
-                document.body.insertAdjacentHTML('beforeend', mainAppHTML);
+            // Update user info display
+            if (currentUser) {
+                document.getElementById('currentUserName').textContent = currentUser.name;
+                document.getElementById('currentUserSpecialty').textContent = currentUser.specialty;
+                document.getElementById('welcomeName').textContent = currentUser.name;
+                
+                // Set avatar
+                const avatarMap = { admin: '👑', premium: '💡', user: '👤' };
+                document.getElementById('userAvatar').textContent = avatarMap[currentUser.role] || '👤';
+                
+                // Set role display
+                const roleMap = { admin: 'مدير', premium: 'عضو مميز', user: 'عضو' };
+                document.getElementById('userRoleDisplay').textContent = roleMap[currentUser.role] || 'عضو';
+                
+                // Show/hide admin menu and buttons
+                const isAdminOrPremium = currentUser.role === 'admin' || currentUser.role === 'premium';
+                document.getElementById('adminMenuItems').classList.toggle('hidden', currentUser.role !== 'admin');
+                document.getElementById('addIdeaBtn').classList.toggle('hidden', !isAdminOrPremium);
+                document.getElementById('addContentBtn').classList.toggle('hidden', currentUser.role !== 'admin');
+            }
+            
+            navigateTo('home');
+        }
+
+        // Navigation
+        function navigateTo(page) {
+            currentPage = page;
+            
+            // Close sidebar on mobile after navigation
+            if (window.innerWidth < 769) {
+                const sidebar = document.getElementById('sidebar');
+                const overlay = document.getElementById('sidebarOverlay');
+                sidebar.classList.remove('sidebar-open');
+                overlay.classList.remove('active');
+            }
+            
+            // Update sidebar active state
+            document.querySelectorAll('.sidebar-item').forEach(item => {
+                item.classList.remove('active');
+                if (item.dataset.page === page) {
+                    item.classList.add('active');
+                }
+            });
+            
+            // Hide all pages
+            document.querySelectorAll('.page-content').forEach(p => p.classList.add('hidden'));
+            
+            // Show target page
+            const targetPage = document.getElementById(`${page}Page`);
+            if (targetPage) {
+                targetPage.classList.remove('hidden');
+            }
+            
+            updateUI();
+        }
+
+        // Update UI
+        function updateUI() {
+            if (!currentUser) return;
+            
+            updateStats();
+            updateQuoteOfDay();
+            updateLatestIdeas();
+            updateIdeasGrid();
+            updateContentGrid();
+            updateSuggestions();
+            updateMembers();
+            updateCodes();
+            updateSettings();
+        }
+
+        // Update Stats
+        function updateStats() {
+            const totalViews = appData.ideas.reduce((sum, i) => sum + (i.views || 0), 0);
+            const totalLikes = appData.ideas.reduce((sum, i) => sum + (i.likes || 0), 0);
+            
+            document.getElementById('totalIdeas').textContent = appData.ideas.length;
+            document.getElementById('totalViews').textContent = totalViews;
+            document.getElementById('totalMembers').textContent = appData.users.length;
+            document.getElementById('totalInteractions').textContent = totalLikes;
+            
+            // Update suggestions badge
+            const pendingSuggestions = appData.suggestions.filter(s => s.status === 'pending').length;
+            const badge = document.getElementById('suggestionsBadge');
+            if (currentUser && currentUser.role === 'admin' && pendingSuggestions > 0) {
+                badge.textContent = pendingSuggestions;
+                badge.classList.remove('hidden');
             } else {
-                document.getElementById('mainApp').classList.remove('hidden');
+                badge.classList.add('hidden');
             }
         }
 
-        // Helper function to get auth method name
-        function getAuthMethodName(method) {
-            const methods = {
-                'traditional': 'الدخول التقليدي',
-                'email': 'البريد الإلكتروني',
-                'google.com': 'حساب جوجل',
-                'password': 'كلمة المرور'
-            };
-            return methods[method] || method;
+        // Update Quote of Day
+        function updateQuoteOfDay() {
+            const dayIndex = new Date().getDate() % QUOTES.length;
+            const quote = QUOTES[dayIndex];
+            document.getElementById('quoteOfDay').textContent = `"${quote.text}" - ${quote.author}`;
         }
 
-        // Render Quotes (placeholder)
+        // Render Quotes
         function renderQuotes() {
-            // Implementation depends on your quotes system
+            const grid = document.getElementById('quotesGrid');
+            if (grid) {
+                grid.innerHTML = QUOTES.map((quote, i) => `
+                    <div class="quote-card glass-card rounded-xl p-5 card-hover" style="animation-delay: ${i * 0.1}s">
+                        <p class="font-amiri text-lg leading-relaxed mb-3">"${quote.text}"</p>
+                        <p class="text-pink-300 text-sm">— ${quote.author}</p>
+                    </div>
+                `).join('');
+            }
         }
 
-        // Update UI (placeholder)
-        function updateUI() {
-            // Implementation depends on your UI
+        // Update Latest Ideas
+        function updateLatestIdeas() {
+            const ideas = appData.ideas.slice(-3).reverse();
+            const grid = document.getElementById('latestIdeasGrid');
+            
+            if (!grid) return;
+            
+            if (ideas.length === 0) {
+                grid.innerHTML = `
+                    <div class="glass-card rounded-xl p-6 text-center text-gray-400">
+                        <p>لا توجد أفكار حتى الآن</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            grid.innerHTML = ideas.map(idea => createIdeaCard(idea)).join('');
+        }
+
+        // Update Ideas Grid
+        function updateIdeasGrid() {
+            let ideas = appData.ideas;
+            
+            if (currentFilter !== 'all') {
+                ideas = ideas.filter(i => i.category === currentFilter);
+            }
+            
+            const grid = document.getElementById('ideasGrid');
+            
+            if (!grid) return;
+            
+            if (ideas.length === 0) {
+                grid.innerHTML = `
+                    <div class="glass-card rounded-xl p-6 text-center text-gray-400 col-span-full">
+                        <p class="text-5xl mb-4">💭</p>
+                        <p>لا توجد أفكار ${currentFilter !== 'all' ? 'في هذا التصنيف' : 'حتى الآن'}</p>
+                        ${currentUser && (currentUser.role === 'admin' || currentUser.role === 'premium') ? '<p class="text-sm mt-2">كن أول من يشارك فكرة!</p>' : ''}
+                    </div>
+                `;
+                return;
+            }
+            
+            grid.innerHTML = ideas.reverse().map(idea => createIdeaCard(idea)).join('');
+        }
+
+        // Create Idea Card
+        function createIdeaCard(idea) {
+            const icon = CATEGORY_ICONS[idea.category] || '💡';
+            const likedBy = idea.likedBy ? idea.likedBy.split(',').filter(Boolean) : [];
+            const isLiked = currentUser && likedBy.includes(currentUser.name);
+            
+            const roleIcons = { admin: '👑', premium: '💡', user: '👤' };
+            const roleIcon = roleIcons[idea.authorRole] || '👤';
+            
+            return `
+                <div class="glass-card rounded-xl p-5 card-hover">
+                    <div class="flex items-start justify-between mb-3">
+                        <span class="category-tag px-3 py-1 rounded-full text-xs">${icon} ${idea.category}</span>
+                        ${idea.featured ? '<span class="text-yellow-400 text-xl">⭐</span>' : ''}
+                    </div>
+                    <h4 class="font-bold text-lg mb-2 line-clamp-2">${idea.title}</h4>
+                    <p class="text-gray-400 text-sm mb-4 line-clamp-2">${idea.content}</p>
+                    <div class="flex items-center justify-between text-sm">
+                        <span class="text-gray-500 flex items-center gap-1">${roleIcon} ${idea.author}</span>
+                        <div class="flex items-center gap-3">
+                            <span class="text-gray-500">👁️ ${idea.views || 0}</span>
+                            <span class="${isLiked ? 'text-red-400' : 'text-gray-500'}">❤️ ${idea.likes || 0}</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Filter Ideas
+        function filterIdeas(filter) {
+            currentFilter = filter;
+            
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.dataset.filter === filter) {
+                    btn.classList.add('active');
+                }
+            });
+            
+            updateIdeasGrid();
+        }
+
+        // Open Add Idea Modal
+        function openAddIdeaModal() {
+            if (currentUser && (currentUser.role === 'admin' || currentUser.role === 'premium')) {
+                // Implement modal opening logic
+                showToast('ميزة إضافة الأفكار قيد التطوير', 'info');
+            } else {
+                showToast('لا تملك صلاحية إضافة أفكار. استخدم رمز ترقية لتصبح عضواً مميزاً.', 'error');
+            }
+        }
+
+        // Open Add Content Modal
+        function openAddContentModal() {
+            if (currentUser && currentUser.role === 'admin') {
+                // Implement modal opening logic
+                showToast('ميزة إضافة المحتوى قيد التطوير', 'info');
+            }
+        }
+
+        // Update Content Grid
+        function updateContentGrid() {
+            const grid = document.getElementById('contentGrid');
+            
+            if (!grid) return;
+            
+            if (appData.content.length === 0) {
+                grid.innerHTML = `
+                    <div class="glass-card rounded-xl p-6 text-center text-gray-400 col-span-full">
+                        <p class="text-5xl mb-4">📚</p>
+                        <p>لا يوجد محتوى حتى الآن</p>
+                        ${currentUser && currentUser.role === 'admin' ? '<p class="text-sm mt-2">أضف أول محتوى فكري!</p>' : ''}
+                    </div>
+                `;
+                return;
+            }
+            
+            grid.innerHTML = appData.content.reverse().map(c => `
+                <div class="glass-card rounded-xl p-6 card-hover">
+                    <h4 class="font-bold text-xl mb-3">${c.title}</h4>
+                    <p class="text-gray-300 leading-relaxed whitespace-pre-wrap">${c.content}</p>
+                    <div class="mt-4 flex items-center justify-between text-sm text-gray-500">
+                        <span>✍️ ${c.author}</span>
+                        ${currentUser && currentUser.role === 'admin' ? `
+                            <button onclick="deleteContent('${c.id}')" class="text-red-400 hover:text-red-300">🗑️</button>
+                        ` : ''}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Delete Content
+        function deleteContent(id) {
+            confirmAction = async () => {
+                try {
+                    await db.collection('content').doc(id).delete();
+                    showToast('تم حذف المحتوى بنجاح', 'success');
+                } catch (error) {
+                    console.error('Error deleting content:', error);
+                    showToast('خطأ في حذف المحتوى', 'error');
+                }
+            };
+            showConfirmModal('حذف المحتوى', 'هل أنت متأكد من حذف هذا المحتوى؟');
+        }
+
+        // Update Suggestions
+        function updateSuggestions() {
+            const list = document.getElementById('suggestionsList');
+            
+            if (!list) return;
+            
+            if (appData.suggestions.length === 0) {
+                list.innerHTML = `
+                    <div class="glass-card rounded-xl p-6 text-center text-gray-400">
+                        <p class="text-5xl mb-4">💡</p>
+                        <p>لا توجد اقتراحات حتى الآن</p>
+                        <p class="text-sm mt-2">شارك أفكارك لتحسين المتحف!</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            list.innerHTML = appData.suggestions.reverse().map(s => {
+                const statusColors = {
+                    pending: 'text-yellow-400',
+                    approved: 'text-green-400',
+                    rejected: 'text-red-400'
+                };
+                const statusText = {
+                    pending: '⏳ قيد المراجعة',
+                    approved: '✅ مقبول',
+                    rejected: '❌ مرفوض'
+                };
+                
+                return `
+                    <div class="glass-card rounded-xl p-5 card-hover">
+                        <div class="flex items-start justify-between mb-3 flex-wrap gap-2">
+                            <span class="category-tag px-3 py-1 rounded-full text-xs">${s.suggestionType}</span>
+                            <span class="${statusColors[s.status] || 'text-gray-400'} text-sm font-bold">${statusText[s.status] || s.status}</span>
+                        </div>
+                        <h4 class="font-bold mb-2">${s.title}</h4>
+                        <p class="text-gray-400 text-sm mb-3">${s.content}</p>
+                        <div class="flex items-center justify-between text-sm flex-wrap gap-2">
+                            <span class="text-gray-500">من: ${s.author}</span>
+                            ${currentUser && currentUser.role === 'admin' && s.status === 'pending' ? `
+                                <div class="flex gap-2">
+                                    <button onclick="updateSuggestionStatus('${s.id}', 'approved')" class="text-green-400 hover:text-green-300 px-3 py-1 rounded bg-green-500/20">✅ قبول</button>
+                                    <button onclick="updateSuggestionStatus('${s.id}', 'rejected')" class="text-red-400 hover:text-red-300 px-3 py-1 rounded bg-red-500/20">❌ رفض</button>
+                                </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Submit Suggestion
+        async function submitSuggestion() {
+            if (!currentUser) {
+                showToast('يرجى تسجيل الدخول أولاً', 'error');
+                return;
+            }
+            
+            const type = document.getElementById('suggestionType')?.value;
+            const title = document.getElementById('suggestionTitle')?.value.trim();
+            const content = document.getElementById('suggestionContent')?.value.trim();
+            
+            if (!title || !content) {
+                showToast('يرجى ملء جميع الحقول', 'error');
+                return;
+            }
+            
+            try {
+                const suggestionData = {
+                    type: 'suggestion',
+                    suggestionType: type,
+                    title,
+                    content,
+                    author: currentUser.name,
+                    status: 'pending',
+                    createdAt: new Date().toISOString()
+                };
+                
+                await db.collection('suggestions').add(suggestionData);
+                
+                if (document.getElementById('suggestionTitle')) {
+                    document.getElementById('suggestionTitle').value = '';
+                }
+                if (document.getElementById('suggestionContent')) {
+                    document.getElementById('suggestionContent').value = '';
+                }
+                showToast('تم إرسال اقتراحك! شكراً لمساهمتك 📝', 'success');
+                
+            } catch (error) {
+                console.error('Error submitting suggestion:', error);
+                showToast('فشل إرسال الاقتراح', 'error');
+            }
+        }
+
+        // Update Suggestion Status
+        async function updateSuggestionStatus(id, status) {
+            try {
+                await db.collection('suggestions').doc(id).update({
+                    status
+                });
+                
+                showToast(`تم ${status === 'approved' ? 'قبول ✅' : 'رفض ❌'} الاقتراح`, 'success');
+                
+            } catch (error) {
+                console.error('Error updating suggestion status:', error);
+                showToast('خطأ في تحديث حالة الاقتراح', 'error');
+            }
+        }
+
+        // Update Members
+        function updateMembers() {
+            const users = [...appData.users].sort((a, b) => 
+                new Date(a.createdAt) - new Date(b.createdAt)
+            );
+            
+            const adminUsers = users.filter(u => u.role === 'admin');
+            const premiumUsers = users.filter(u => u.role === 'premium');
+            const regularUsers = users.filter(u => u.role === 'user');
+            
+            const adminList = document.getElementById('adminMembersList');
+            const premiumList = document.getElementById('premiumMembersList');
+            const regularList = document.getElementById('regularMembersList');
+            
+            if (!adminList || !premiumList || !regularList) return;
+            
+            const formatDate = (dateStr) => {
+                const date = new Date(dateStr);
+                return date.toLocaleDateString('ar-EG', { year: 'numeric', month: 'short', day: 'numeric' });
+            };
+            
+            if (adminUsers.length === 0) {
+                adminList.innerHTML = '<p class="text-gray-400 text-center">لا يوجد مدراء</p>';
+            } else {
+                adminList.innerHTML = adminUsers.map(u => `
+                    <div class="glass-card rounded-xl p-4 flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <span class="text-3xl">👑</span>
+                            <div>
+                                <p class="font-bold flex items-center gap-2">
+                                    ${u.name}
+                                    <span class="role-badge role-admin">مدير</span>
+                                </p>
+                                <p class="text-sm text-gray-400">${u.specialty}</p>
+                                <p class="text-xs text-gray-500">انضم في ${formatDate(u.createdAt)}</p>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            }
+            
+            if (premiumUsers.length === 0) {
+                premiumList.innerHTML = '<p class="text-gray-400 text-center">لا يوجد أعضاء مميزون</p>';
+            } else {
+                premiumList.innerHTML = premiumUsers.map(u => `
+                    <div class="glass-card rounded-xl p-4 flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <span class="text-2xl">💡</span>
+                            <div>
+                                <p class="font-bold flex items-center gap-2">
+                                    ${u.name}
+                                    <span class="role-badge role-premium">مميز</span>
+                                </p>
+                                <p class="text-sm text-gray-400">${u.specialty}</p>
+                                ${u.upgradeCode ? `<p class="text-xs text-indigo-400">رمز الترقية: ${u.upgradeCode}</p>` : ''}
+                                <p class="text-xs text-gray-500">انضم في ${formatDate(u.createdAt)}</p>
+                            </div>
+                        </div>
+                        ${currentUser && currentUser.role === 'admin' && u.name !== currentUser.name ? `
+                            <button onclick="deleteMember('${u.id}')" class="text-red-400 hover:text-red-300">🗑️</button>
+                        ` : ''}
+                    </div>
+                `).join('');
+            }
+            
+            if (regularUsers.length === 0) {
+                regularList.innerHTML = '<p class="text-gray-400 text-center">لا يوجد أعضاء</p>';
+            } else {
+                regularList.innerHTML = regularUsers.map(u => `
+                    <div class="glass-card rounded-xl p-4 flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <span class="text-2xl">👤</span>
+                            <div>
+                                <p class="font-bold flex items-center gap-2">
+                                    ${u.name}
+                                    <span class="role-badge role-user">عادي</span>
+                                </p>
+                                <p class="text-sm text-gray-400">${u.specialty}</p>
+                                <p class="text-xs text-gray-500">انضم في ${formatDate(u.createdAt)}</p>
+                            </div>
+                        </div>
+                        ${currentUser && currentUser.role === 'admin' ? `
+                            <button onclick="deleteMember('${u.id}')" class="text-red-400 hover:text-red-300">🗑️</button>
+                        ` : ''}
+                    </div>
+                `).join('');
+            }
+        }
+
+        // Delete Member
+        function deleteMember(id) {
+            confirmAction = async () => {
+                try {
+                    await db.collection('users').doc(id).delete();
+                    showToast('تم حذف العضو بنجاح', 'success');
+                } catch (error) {
+                    console.error('Error deleting member:', error);
+                    showToast('خطأ في حذف العضو', 'error');
+                }
+            };
+            showConfirmModal('حذف العضو', 'هل أنت متأكد من حذف هذا العضو؟ سيتم حذف جميع بياناته.');
+        }
+
+        // Update Codes
+        function updateCodes() {
+            const list = document.getElementById('codesList');
+            
+            if (!list) return;
+            
+            if (appData.codes.length === 0) {
+                list.innerHTML = '<p class="text-gray-400 text-center">لا توجد رموز</p>';
+                return;
+            }
+            
+            const formatDate = (dateStr) => {
+                const date = new Date(dateStr);
+                return date.toLocaleDateString('ar-EG', { year: 'numeric', month: 'short', day: 'numeric' });
+            };
+            
+            list.innerHTML = appData.codes.reverse().map(c => `
+                <div class="glass-card rounded-xl p-4 flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <span class="text-2xl">${c.usedBy ? '✅' : '🎫'}</span>
+                        <div>
+                            <p class="font-mono font-bold text-pink-400 text-lg">${c.code}</p>
+                            ${c.usedBy ? `
+                                <p class="text-sm text-green-400">استخدمه: ${c.usedBy}</p>
+                                <p class="text-xs text-gray-500">في: ${formatDate(c.usedAt)}</p>
+                            ` : '<p class="text-sm text-yellow-400">⏳ متاح للاستخدام</p>'}
+                        </div>
+                    </div>
+                    ${!c.usedBy ? `
+                        <button onclick="deleteCode('${c.id}')" class="text-red-400 hover:text-red-300">🗑️</button>
+                    ` : ''}
+                </div>
+            `).join('');
+        }
+
+        // Generate Code
+        async function generateCode() {
+            const input = document.getElementById('newCodeInput');
+            let code = input?.value.trim();
+            
+            if (!code) {
+                code = 'MUF-' + Math.random().toString(36).substring(2, 8).toUpperCase();
+            }
+            
+            // Check if code exists
+            const existingCode = appData.codes.find(c => c.code === code);
+            if (existingCode) {
+                showToast('هذا الرمز موجود بالفعل', 'error');
+                return;
+            }
+            
+            try {
+                const codeData = {
+                    code,
+                    usedBy: '',
+                    usedAt: '',
+                    createdAt: new Date().toISOString()
+                };
+                
+                await db.collection('codes').add(codeData);
+                
+                if (input) input.value = '';
+                showToast(`تم إنشاء الرمز: ${code} 🎫`, 'success');
+                
+            } catch (error) {
+                console.error('Error generating code:', error);
+                showToast('خطأ في إنشاء الرمز', 'error');
+            }
+        }
+
+        // Delete Code
+        function deleteCode(id) {
+            confirmAction = async () => {
+                try {
+                    await db.collection('codes').doc(id).delete();
+                    showToast('تم حذف الرمز بنجاح', 'success');
+                } catch (error) {
+                    console.error('Error deleting code:', error);
+                    showToast('خطأ في حذف الرمز', 'error');
+                }
+            };
+            showConfirmModal('حذف الرمز', 'هل أنت متأكد من حذف هذا الرمز؟');
+        }
+
+        // Update Settings
+        function updateSettings() {
+            const pendingSuggestions = appData.suggestions.filter(s => s.status === 'pending');
+            const activeCodes = appData.codes.filter(c => !c.usedBy);
+            
+            document.getElementById('settingsIdeasCount').textContent = appData.ideas.length;
+            document.getElementById('settingsMembersCount').textContent = appData.users.length;
+            document.getElementById('settingsSuggestionsCount').textContent = pendingSuggestions.length;
+            document.getElementById('settingsCodesCount').textContent = activeCodes.length;
+        }
+
+        // Export Data
+        async function exportData() {
+            try {
+                const dataToExport = {
+                    users: appData.users,
+                    ideas: appData.ideas,
+                    content: appData.content,
+                    suggestions: appData.suggestions,
+                    codes: appData.codes,
+                    exportDate: new Date().toISOString()
+                };
+                
+                const dataStr = JSON.stringify(dataToExport, null, 2);
+                const blob = new Blob([dataStr], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `muf_backup_${new Date().toISOString().split('T')[0]}.json`;
+                a.click();
+                URL.revokeObjectURL(url);
+                showToast('تم تصدير البيانات بنجاح 📥', 'success');
+            } catch (error) {
+                console.error('Error exporting data:', error);
+                showToast('خطأ في تصدير البيانات', 'error');
+            }
+        }
+
+        // Confirm Clear Data
+        function confirmClearData() {
+            confirmAction = async () => {
+                try {
+                    // Delete all documents from all collections
+                    const deletePromises = [];
+                    
+                    // Delete all ideas
+                    appData.ideas.forEach(idea => {
+                        deletePromises.push(db.collection('ideas').doc(idea.id).delete());
+                    });
+                    
+                    // Delete all content
+                    appData.content.forEach(content => {
+                        deletePromises.push(db.collection('content').doc(content.id).delete());
+                    });
+                    
+                    // Delete all suggestions
+                    appData.suggestions.forEach(suggestion => {
+                        deletePromises.push(db.collection('suggestions').doc(suggestion.id).delete());
+                    });
+                    
+                    // Delete all codes
+                    appData.codes.forEach(code => {
+                        deletePromises.push(db.collection('codes').doc(code.id).delete());
+                    });
+                    
+                    // Delete all users except current user
+                    appData.users.forEach(user => {
+                        if (user.id !== currentUser.id) {
+                            deletePromises.push(db.collection('users').doc(user.id).delete());
+                        }
+                    });
+                    
+                    await Promise.all(deletePromises);
+                    showToast('تم حذف جميع البيانات', 'success');
+                } catch (error) {
+                    console.error('Error clearing data:', error);
+                    showToast('خطأ في حذف البيانات', 'error');
+                }
+            };
+            showConfirmModal('حذف جميع البيانات', 'هل أنت متأكد من حذف جميع البيانات؟ هذا الإجراء لا يمكن التراجع عنه!');
+        }
+
+        // Show Confirm Modal
+        function showConfirmModal(title, message) {
+            // Implement confirm modal logic
+            showToast(`${title}: ${message}`, 'info');
         }
 
         // Show Toast Notification
@@ -950,4 +2443,4 @@
         document.addEventListener('DOMContentLoaded', initApp);
     </script>
 </body>
-</html>
+    </html>
