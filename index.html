@@ -387,6 +387,72 @@
     <!-- Sidebar Overlay (Mobile) -->
     <div id="sidebarOverlay" class="sidebar-overlay" onclick="toggleSidebar()"></div>
     
+    <!-- Modal for Adding Idea -->
+    <div id="addIdeaModal" class="modal-overlay fixed inset-0 z-50 flex items-center justify-center hidden">
+        <div class="glass-dark rounded-2xl p-6 w-full max-w-md mx-4 animate-fade-in">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-2xl font-bold gradient-text">إضافة فكرة جديدة</h3>
+                <button onclick="closeModal('addIdeaModal')" class="text-2xl text-gray-400 hover:text-white">&times;</button>
+            </div>
+            
+            <div class="space-y-4">
+                <div>
+                    <label for="newIdeaTitle" class="block text-sm mb-2">عنوان الفكرة</label>
+                    <input type="text" id="newIdeaTitle" class="input-style w-full px-4 py-3 rounded-xl" placeholder="اكتب عنواناً مختصراً للفكرة">
+                </div>
+                
+                <div>
+                    <label for="newIdeaCategory" class="block text-sm mb-2">التصنيف</label>
+                    <select id="newIdeaCategory" class="input-style w-full px-4 py-3 rounded-xl">
+                        <option value="فلسفة">🧠 فلسفة</option>
+                        <option value="تقنية">💻 تقنية</option>
+                        <option value="أدب">📖 أدب</option>
+                        <option value="علوم">🔬 علوم</option>
+                        <option value="فن">🎨 فن</option>
+                        <option value="اجتماع">👥 اجتماع</option>
+                    </select>
+                </div>
+                
+                <div>
+                    <label for="newIdeaContent" class="block text-sm mb-2">محتوى الفكرة</label>
+                    <textarea id="newIdeaContent" class="input-style w-full px-4 py-3 rounded-xl h-40 resize-none" placeholder="اشرح فكرتك بالتفصيل..."></textarea>
+                </div>
+            </div>
+            
+            <div class="flex gap-3 mt-6">
+                <button onclick="closeModal('addIdeaModal')" class="btn-secondary flex-1 py-3 rounded-xl">إلغاء</button>
+                <button onclick="submitNewIdea()" class="btn-primary flex-1 py-3 rounded-xl">نشر الفكرة</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal for Adding Quote -->
+    <div id="addQuoteModal" class="modal-overlay fixed inset-0 z-50 flex items-center justify-center hidden">
+        <div class="glass-dark rounded-2xl p-6 w-full max-w-md mx-4 animate-fade-in">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-2xl font-bold gradient-text">إضافة عبارة ملهمة</h3>
+                <button onclick="closeModal('addQuoteModal')" class="text-2xl text-gray-400 hover:text-white">&times;</button>
+            </div>
+            
+            <div class="space-y-4">
+                <div>
+                    <label for="newQuoteText" class="block text-sm mb-2">النص</label>
+                    <textarea id="newQuoteText" class="input-style w-full px-4 py-3 rounded-xl h-32 resize-none" placeholder="اكتب العبارة الملهمة..."></textarea>
+                </div>
+                
+                <div>
+                    <label for="newQuoteAuthor" class="block text-sm mb-2">المؤلف</label>
+                    <input type="text" id="newQuoteAuthor" class="input-style w-full px-4 py-3 rounded-xl" placeholder="اسم المؤلف">
+                </div>
+            </div>
+            
+            <div class="flex gap-3 mt-6">
+                <button onclick="closeModal('addQuoteModal')" class="btn-secondary flex-1 py-3 rounded-xl">إلغاء</button>
+                <button onclick="submitNewQuote()" class="btn-primary flex-1 py-3 rounded-xl">إضافة العبارة</button>
+            </div>
+        </div>
+    </div>
+    
     <div id="app" class="h-full w-full">
         <!-- Login Screen -->
         <div id="loginScreen" class="h-full w-full flex items-center justify-center p-4 overflow-auto">
@@ -745,6 +811,7 @@
                             <div>
                                 <h3 class="text-lg font-bold mb-2 text-pink-300">عبارة اليوم</h3>
                                 <p class="text-xl font-amiri leading-relaxed" id="quoteOfDay">"الفكرة هي البذرة، والعقل هو التربة، والإبداع هو الثمرة"</p>
+                                <p class="text-sm text-gray-400 mt-2" id="quoteAuthor">- من حكم متحف الفكر</p>
                             </div>
                         </div>
                     </div>
@@ -770,7 +837,7 @@
                             <h2 class="text-3xl font-bold">💡 معرض الأفكار</h2>
                             <p class="text-gray-400 mt-1">استكشف أفكار المبدعين</p>
                         </div>
-                        <button id="addIdeaBtn" onclick="openAddIdeaModal()" class="btn-primary px-6 py-3 rounded-xl flex items-center gap-2 hidden">
+                        <button id="addIdeaBtn" onclick="openAddIdeaModal()" class="btn-primary px-6 py-3 rounded-xl flex items-center gap-2">
                             <span>➕</span>
                             <span>إضافة فكرة</span>
                         </button>
@@ -849,9 +916,15 @@
                 
                 <!-- Quotes Page -->
                 <div id="quotesPage" class="page-content hidden animate-fade-in">
-                    <div class="mb-6">
-                        <h2 class="text-3xl font-bold">✨ العبارات الملهمة</h2>
-                        <p class="text-gray-400 mt-1">كلمات تلهم وتحفز</p>
+                    <div class="flex items-center justify-between mb-6 flex-wrap gap-4">
+                        <div>
+                            <h2 class="text-3xl font-bold">✨ العبارات الملهمة</h2>
+                            <p class="text-gray-400 mt-1">كلمات تلهم وتحفز</p>
+                        </div>
+                        <button id="addQuoteBtn" onclick="openAddQuoteModal()" class="btn-primary px-6 py-3 rounded-xl flex items-center gap-2">
+                            <span>➕</span>
+                            <span>إضافة عبارة</span>
+                        </button>
                     </div>
                     
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="quotesGrid">
@@ -1224,7 +1297,8 @@
             ideas: [],
             content: [],
             suggestions: [],
-            codes: []
+            codes: [],
+            quotes: [] // Added quotes array
         };
         let currentUser = null;
         let currentPage = 'home';
@@ -1238,21 +1312,21 @@
             { name: 'MUF', specialty: 'CS' }
         ];
 
-        // Inspirational Quotes
-        const QUOTES = [
-            { text: "العقل كالمظلة، لا يعمل إلا إذا كان مفتوحاً", author: "حكمة شعبية" },
-            { text: "أنا أفكر، إذن أنا موجود", author: "رينيه ديكارت" },
-            { text: "الخيال أهم من المعرفة، فالمعرفة محدودة أما الخيال فيحيط بالعالم", author: "ألبرت أينشتاين" },
-            { text: "القراءة تمنح الإنسان حيوات متعددة في حياة واحدة", author: "من حكم الأدب" },
-            { text: "الفكرة التي لا تتحول إلى فعل، ليست أكثر من حلم", author: "حكمة عملية" },
-            { text: "المعرفة قوة، ولكن التطبيق هو السلطان", author: "فرانسيس بيكون" },
-            { text: "النجاح ليس نهاية، والفشل ليس قاتلاً، إنها الشجاعة على الاستمرار هي التي تحسب", author: "ونستون تشرشل" },
-            { text: "التغيير يبدأ من الداخل، وينمو نحو الخارج", author: "من حكم التطور الذاتي" },
-            { text: "كن كالماء، مرناً وقوياً في آن واحد", author: "بروس لي" },
-            { text: "الإبداع هو الذكاء وهو يستمتع", author: "ألبرت أينشتاين" },
-            { text: "الحياة إما مغامرة جريئة أو لا شيء", author: "هيلين كيلر" },
-            { text: "القمة ليست الهدف، بل الرحلة إليها", author: "من حكم المسافرين" },
-            { text: "الفكرة هي البذرة، والعقل هو التربة، والإبداع هو الثمرة", author: "من حكم متحف الفكر" }
+        // Default Inspirational Quotes (static)
+        const DEFAULT_QUOTES = [
+            { text: "العقل كالمظلة، لا يعمل إلا إذا كان مفتوحاً", author: "حكمة شعبية", id: "default_1", isDefault: true },
+            { text: "أنا أفكر، إذن أنا موجود", author: "رينيه ديكارت", id: "default_2", isDefault: true },
+            { text: "الخيال أهم من المعرفة، فالمعرفة محدودة أما الخيال فيحيط بالعالم", author: "ألبرت أينشتاين", id: "default_3", isDefault: true },
+            { text: "القراءة تمنح الإنسان حيوات متعددة في حياة واحدة", author: "من حكم الأدب", id: "default_4", isDefault: true },
+            { text: "الفكرة التي لا تتحول إلى فعل، ليست أكثر من حلم", author: "حكمة عملية", id: "default_5", isDefault: true },
+            { text: "المعرفة قوة، ولكن التطبيق هو السلطان", author: "فرانسيس بيكون", id: "default_6", isDefault: true },
+            { text: "النجاح ليس نهاية، والفشل ليس قاتلاً، إنها الشجاعة على الاستمرار هي التي تحسب", author: "ونستون تشرشل", id: "default_7", isDefault: true },
+            { text: "التغيير يبدأ من الداخل، وينمو نحو الخارج", author: "من حكم التطور الذاتي", id: "default_8", isDefault: true },
+            { text: "كن كالماء، مرناً وقوياً في آن واحد", author: "بروس لي", id: "default_9", isDefault: true },
+            { text: "الإبداع هو الذكاء وهو يستمتع", author: "ألبرت أينشتاين", id: "default_10", isDefault: true },
+            { text: "الحياة إما مغامرة جريئة أو لا شيء", author: "هيلين كيلر", id: "default_11", isDefault: true },
+            { text: "القمة ليست الهدف، بل الرحلة إليها", author: "من حكم المسافرين", id: "default_12", isDefault: true },
+            { text: "الفكرة هي البذرة، والعقل هو التربة، والإبداع هو الثمرة", author: "من حكم متحف الفكر", id: "default_13", isDefault: true }
         ];
 
         // Category Icons
@@ -1287,7 +1361,7 @@
                     showMainApp();
                 }
 
-                // Render quotes
+                // Initial render of quotes
                 renderQuotes();
 
                 // Show menu toggle on mobile
@@ -1655,7 +1729,8 @@
                     db.collection('ideas').get(),
                     db.collection('content').get(),
                     db.collection('suggestions').get(),
-                    db.collection('codes').get()
+                    db.collection('codes').get(),
+                    db.collection('quotes').get() // Load quotes from Firestore
                 ];
 
                 const results = await Promise.all(promises);
@@ -1665,7 +1740,8 @@
                     ideas: results[1].docs.map(doc => ({ id: doc.id, ...doc.data() })),
                     content: results[2].docs.map(doc => ({ id: doc.id, ...doc.data() })),
                     suggestions: results[3].docs.map(doc => ({ id: doc.id, ...doc.data() })),
-                    codes: results[4].docs.map(doc => ({ id: doc.id, ...doc.data() }))
+                    codes: results[4].docs.map(doc => ({ id: doc.id, ...doc.data() })),
+                    quotes: results[5].docs.map(doc => ({ id: doc.id, ...doc.data() }))
                 };
 
                 // Set up real-time listeners
@@ -1719,6 +1795,119 @@
                     updateUI();
                 }
             });
+
+            // Listen for quotes changes
+            db.collection('quotes').onSnapshot((snapshot) => {
+                appData.quotes = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                if (currentPage === 'quotes' || currentPage === 'home') {
+                    updateUI();
+                }
+            });
+        }
+
+        // Open Add Idea Modal
+        function openAddIdeaModal() {
+            if (currentUser && (currentUser.role === 'admin' || currentUser.role === 'premium')) {
+                document.getElementById('addIdeaModal').classList.remove('hidden');
+            } else {
+                showToast('لا تملك صلاحية إضافة أفكار. استخدم رمز ترقية لتصبح عضواً مميزاً.', 'error');
+            }
+        }
+
+        // Close Modal
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.add('hidden');
+        }
+
+        // Submit New Idea
+        async function submitNewIdea() {
+            const title = document.getElementById('newIdeaTitle').value.trim();
+            const category = document.getElementById('newIdeaCategory').value;
+            const content = document.getElementById('newIdeaContent').value.trim();
+            
+            if (!title || !content) {
+                showToast('يرجى ملء جميع الحقول', 'error');
+                return;
+            }
+            
+            try {
+                const ideaData = {
+                    title,
+                    category,
+                    content,
+                    author: currentUser.name,
+                    authorRole: currentUser.role,
+                    views: 0,
+                    likes: 0,
+                    likedBy: '',
+                    featured: false,
+                    createdAt: new Date().toISOString()
+                };
+                
+                await db.collection('ideas').add(ideaData);
+                
+                // Close modal and clear fields
+                closeModal('addIdeaModal');
+                document.getElementById('newIdeaTitle').value = '';
+                document.getElementById('newIdeaContent').value = '';
+                
+                showToast('تمت إضافة الفكرة بنجاح!', 'success');
+                
+            } catch (error) {
+                console.error('Error adding idea:', error);
+                showToast('حدث خطأ أثناء إضافة الفكرة', 'error');
+            }
+        }
+
+        // Open Add Quote Modal
+        function openAddQuoteModal() {
+            if (currentUser && (currentUser.role === 'admin' || currentUser.role === 'premium')) {
+                document.getElementById('addQuoteModal').classList.remove('hidden');
+            } else {
+                showToast('لا تملك صلاحية إضافة عبارات ملهمة.', 'error');
+            }
+        }
+
+        // Submit New Quote
+        async function submitNewQuote() {
+            const text = document.getElementById('newQuoteText').value.trim();
+            const author = document.getElementById('newQuoteAuthor').value.trim();
+            
+            if (!text || !author) {
+                showToast('يرجى ملء جميع الحقول', 'error');
+                return;
+            }
+            
+            try {
+                const quoteData = {
+                    text,
+                    author,
+                    addedBy: currentUser.name,
+                    isDefault: false,
+                    createdAt: new Date().toISOString()
+                };
+                
+                await db.collection('quotes').add(quoteData);
+                
+                // Close modal and clear fields
+                closeModal('addQuoteModal');
+                document.getElementById('newQuoteText').value = '';
+                document.getElementById('newQuoteAuthor').value = '';
+                
+                showToast('تمت إضافة العبارة بنجاح!', 'success');
+                
+            } catch (error) {
+                console.error('Error adding quote:', error);
+                showToast('حدث خطأ أثناء إضافة العبارة', 'error');
+            }
+        }
+
+        // Open Add Content Modal
+        function openAddContentModal() {
+            if (currentUser && currentUser.role === 'admin') {
+                // Implement modal opening logic
+                showToast('ميزة إضافة المحتوى قيد التطوير', 'info');
+            }
         }
 
         // Toggle Sidebar (Mobile)
@@ -1785,6 +1974,7 @@
                 document.getElementById('adminMenuItems').classList.toggle('hidden', currentUser.role !== 'admin');
                 document.getElementById('addIdeaBtn').classList.toggle('hidden', !isAdminOrPremium);
                 document.getElementById('addContentBtn').classList.toggle('hidden', currentUser.role !== 'admin');
+                document.getElementById('addQuoteBtn').classList.toggle('hidden', !isAdminOrPremium);
             }
             
             navigateTo('home');
@@ -1835,6 +2025,7 @@
             updateMembers();
             updateCodes();
             updateSettings();
+            renderQuotes(); // Update quotes display
         }
 
         // Update Stats
@@ -1860,27 +2051,71 @@
 
         // Update Quote of Day
         function updateQuoteOfDay() {
-            const dayIndex = new Date().getDate() % QUOTES.length;
-            const quote = QUOTES[dayIndex];
-            document.getElementById('quoteOfDay').textContent = `"${quote.text}" - ${quote.author}`;
+            // Combine default quotes with user-added quotes
+            const allQuotes = [...DEFAULT_QUOTES, ...appData.quotes];
+            
+            // Sort by creation date (newest first for user quotes)
+            allQuotes.sort((a, b) => {
+                const dateA = a.createdAt ? new Date(a.createdAt) : new Date(0);
+                const dateB = b.createdAt ? new Date(b.createdAt) : new Date(0);
+                return dateB - dateA; // Newest first
+            });
+            
+            // Get quote of the day based on date
+            const dayOfYear = Math.floor((new Date() - new Date(new Date().getFullYear(), 0, 0)) / (1000 * 60 * 60 * 24));
+            const quoteIndex = dayOfYear % allQuotes.length;
+            const quote = allQuotes[quoteIndex];
+            
+            document.getElementById('quoteOfDay').textContent = `"${quote.text}"`;
+            document.getElementById('quoteAuthor').textContent = `- ${quote.author}`;
         }
 
         // Render Quotes
         function renderQuotes() {
             const grid = document.getElementById('quotesGrid');
-            if (grid) {
-                grid.innerHTML = QUOTES.map((quote, i) => `
-                    <div class="quote-card glass-card rounded-xl p-5 card-hover" style="animation-delay: ${i * 0.1}s">
+            if (!grid) return;
+            
+            // Combine default quotes with user-added quotes
+            const allQuotes = [...DEFAULT_QUOTES, ...appData.quotes];
+            
+            // Sort by creation date (newest first)
+            allQuotes.sort((a, b) => {
+                const dateA = a.createdAt ? new Date(a.createdAt) : new Date(0);
+                const dateB = b.createdAt ? new Date(b.createdAt) : new Date(0);
+                return dateB - dateA; // Newest first
+            });
+            
+            if (allQuotes.length === 0) {
+                grid.innerHTML = `
+                    <div class="glass-card rounded-xl p-6 text-center text-gray-400">
+                        <p>لا توجد عبارات حتى الآن</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            grid.innerHTML = allQuotes.map((quote, i) => {
+                const isUserAdded = !quote.isDefault;
+                const addedByText = isUserAdded ? `<p class="text-xs text-gray-500 mt-1">أضافه: ${quote.addedBy || 'مستخدم'}</p>` : '';
+                
+                return `
+                    <div class="quote-card glass-card rounded-xl p-5 card-hover animate-fade-in" style="animation-delay: ${i * 0.05}s">
                         <p class="font-amiri text-lg leading-relaxed mb-3">"${quote.text}"</p>
                         <p class="text-pink-300 text-sm">— ${quote.author}</p>
+                        ${addedByText}
                     </div>
-                `).join('');
-            }
+                `;
+            }).join('');
         }
 
         // Update Latest Ideas
         function updateLatestIdeas() {
-            const ideas = appData.ideas.slice(-3).reverse();
+            // Sort ideas by creation date (newest first)
+            const sortedIdeas = [...appData.ideas].sort((a, b) => {
+                return new Date(b.createdAt) - new Date(a.createdAt);
+            });
+            
+            const ideas = sortedIdeas.slice(0, 3); // Get latest 3 ideas
             const grid = document.getElementById('latestIdeasGrid');
             
             if (!grid) return;
@@ -1899,7 +2134,12 @@
 
         // Update Ideas Grid
         function updateIdeasGrid() {
-            let ideas = appData.ideas;
+            let ideas = [...appData.ideas];
+            
+            // Sort by creation date (newest first)
+            ideas.sort((a, b) => {
+                return new Date(b.createdAt) - new Date(a.createdAt);
+            });
             
             if (currentFilter !== 'all') {
                 ideas = ideas.filter(i => i.category === currentFilter);
@@ -1920,7 +2160,7 @@
                 return;
             }
             
-            grid.innerHTML = ideas.reverse().map(idea => createIdeaCard(idea)).join('');
+            grid.innerHTML = ideas.map(idea => createIdeaCard(idea)).join('');
         }
 
         // Create Idea Card
@@ -1933,13 +2173,13 @@
             const roleIcon = roleIcons[idea.authorRole] || '👤';
             
             return `
-                <div class="glass-card rounded-xl p-5 card-hover">
+                <div class="glass-card rounded-xl p-5 card-hover animate-fade-in">
                     <div class="flex items-start justify-between mb-3">
                         <span class="category-tag px-3 py-1 rounded-full text-xs">${icon} ${idea.category}</span>
                         ${idea.featured ? '<span class="text-yellow-400 text-xl">⭐</span>' : ''}
                     </div>
                     <h4 class="font-bold text-lg mb-2 line-clamp-2">${idea.title}</h4>
-                    <p class="text-gray-400 text-sm mb-4 line-clamp-2">${idea.content}</p>
+                    <p class="text-gray-400 text-sm mb-4 line-clamp-3">${idea.content}</p>
                     <div class="flex items-center justify-between text-sm">
                         <span class="text-gray-500 flex items-center gap-1">${roleIcon} ${idea.author}</span>
                         <div class="flex items-center gap-3">
@@ -1963,24 +2203,6 @@
             });
             
             updateIdeasGrid();
-        }
-
-        // Open Add Idea Modal
-        function openAddIdeaModal() {
-            if (currentUser && (currentUser.role === 'admin' || currentUser.role === 'premium')) {
-                // Implement modal opening logic
-                showToast('ميزة إضافة الأفكار قيد التطوير', 'info');
-            } else {
-                showToast('لا تملك صلاحية إضافة أفكار. استخدم رمز ترقية لتصبح عضواً مميزاً.', 'error');
-            }
-        }
-
-        // Open Add Content Modal
-        function openAddContentModal() {
-            if (currentUser && currentUser.role === 'admin') {
-                // Implement modal opening logic
-                showToast('ميزة إضافة المحتوى قيد التطوير', 'info');
-            }
         }
 
         // Update Content Grid
@@ -2140,7 +2362,7 @@
         // Update Members
         function updateMembers() {
             const users = [...appData.users].sort((a, b) => 
-                new Date(a.createdAt) - new Date(b.createdAt)
+                new Date(b.createdAt) - new Date(a.createdAt) // Newest first
             );
             
             const adminUsers = users.filter(u => u.role === 'admin');
@@ -2344,6 +2566,7 @@
                     content: appData.content,
                     suggestions: appData.suggestions,
                     codes: appData.codes,
+                    quotes: appData.quotes,
                     exportDate: new Date().toISOString()
                 };
                 
@@ -2387,6 +2610,13 @@
                     // Delete all codes
                     appData.codes.forEach(code => {
                         deletePromises.push(db.collection('codes').doc(code.id).delete());
+                    });
+                    
+                    // Delete all quotes (user-added only)
+                    appData.quotes.forEach(quote => {
+                        if (!quote.isDefault) {
+                            deletePromises.push(db.collection('quotes').doc(quote.id).delete());
+                        }
                     });
                     
                     // Delete all users except current user
