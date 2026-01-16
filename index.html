@@ -377,6 +377,56 @@
             -webkit-box-orient: vertical;
             overflow: hidden;
         }
+        
+        .banned-user {
+            opacity: 0.6;
+            position: relative;
+        }
+        
+        .banned-user::after {
+            content: '🚫';
+            position: absolute;
+            top: 5px;
+            left: 5px;
+        }
+        
+        .comment-section {
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding-top: 15px;
+            margin-top: 15px;
+        }
+        
+        .course-card {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(139, 92, 246, 0.1));
+            border-right: 4px solid #3b82f6;
+        }
+        
+        .message-bubble {
+            max-width: 80%;
+            border-radius: 18px;
+            padding: 12px 16px;
+            margin: 8px 0;
+            word-wrap: break-word;
+        }
+        
+        .message-bubble.sent {
+            background: linear-gradient(135deg, #3b82f6, #6366f1);
+            color: white;
+            margin-left: auto;
+            margin-right: 0;
+        }
+        
+        .message-bubble.received {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            margin-right: auto;
+            margin-left: 0;
+        }
+        
+        .channel-card {
+            background: linear-gradient(135deg, rgba(34, 197, 94, 0.1), rgba(16, 185, 129, 0.1));
+            border-right: 4px solid #10b981;
+        }
     </style>
     <style>@view-transition { navigation: auto; }</style>
 </head>
@@ -449,6 +499,88 @@
             <div class="flex gap-3 mt-6">
                 <button onclick="closeModal('addQuoteModal')" class="btn-secondary flex-1 py-3 rounded-xl">إلغاء</button>
                 <button onclick="submitNewQuote()" class="btn-primary flex-1 py-3 rounded-xl">إضافة العبارة</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal for Adding Course/Channel -->
+    <div id="addCourseModal" class="modal-overlay fixed inset-0 z-50 flex items-center justify-center hidden">
+        <div class="glass-dark rounded-2xl p-6 w-full max-w-md mx-4 animate-fade-in">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-2xl font-bold gradient-text">إضافة مصدر تعليمي</h3>
+                <button onclick="closeModal('addCourseModal')" class="text-2xl text-gray-400 hover:text-white">&times;</button>
+            </div>
+            
+            <div class="space-y-4">
+                <div>
+                    <label for="newCourseTitle" class="block text-sm mb-2">عنوان المصدر</label>
+                    <input type="text" id="newCourseTitle" class="input-style w-full px-4 py-3 rounded-xl" placeholder="اسم القناة أو الكورس">
+                </div>
+                
+                <div>
+                    <label for="newCourseType" class="block text-sm mb-2">نوع المصدر</label>
+                    <select id="newCourseType" class="input-style w-full px-4 py-3 rounded-xl">
+                        <option value="قناة يوتيوب">📺 قناة يوتيوب</option>
+                        <option value="كورس أونلاين">🎓 كورس أونلاين</option>
+                        <option value="منصة تعليمية">💻 منصة تعليمية</option>
+                        <option value="مقالات">📝 مقالات</option>
+                        <option value="كتب">📚 كتب</option>
+                        <option value="بودكاست">🎙️ بودكاست</option>
+                    </select>
+                </div>
+                
+                <div>
+                    <label for="newCourseDescription" class="block text-sm mb-2">الوصف</label>
+                    <textarea id="newCourseDescription" class="input-style w-full px-4 py-3 rounded-xl h-32 resize-none" placeholder="وصف مختصر للمصدر..."></textarea>
+                </div>
+                
+                <div>
+                    <label for="newCourseLink" class="block text-sm mb-2">الرابط (اختياري)</label>
+                    <input type="text" id="newCourseLink" class="input-style w-full px-4 py-3 rounded-xl" placeholder="https://example.com">
+                </div>
+            </div>
+            
+            <div class="flex gap-3 mt-6">
+                <button onclick="closeModal('addCourseModal')" class="btn-secondary flex-1 py-3 rounded-xl">إلغاء</button>
+                <button onclick="submitNewCourse()" class="btn-primary flex-1 py-3 rounded-xl">إضافة المصدر</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal for Sending Message to Admin -->
+    <div id="messageAdminModal" class="modal-overlay fixed inset-0 z-50 flex items-center justify-center hidden">
+        <div class="glass-dark rounded-2xl p-6 w-full max-w-md mx-4 animate-fade-in">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-2xl font-bold gradient-text">إرسال رسالة إلى المدير</h3>
+                <button onclick="closeModal('messageAdminModal')" class="text-2xl text-gray-400 hover:text-white">&times;</button>
+            </div>
+            
+            <div class="space-y-4">
+                <div>
+                    <label for="messageTitle" class="block text-sm mb-2">عنوان الرسالة</label>
+                    <input type="text" id="messageTitle" class="input-style w-full px-4 py-3 rounded-xl" placeholder="عنوان الرسالة">
+                </div>
+                
+                <div>
+                    <label for="messageType" class="block text-sm mb-2">نوع الرسالة</label>
+                    <select id="messageType" class="input-style w-full px-4 py-3 rounded-xl">
+                        <option value="طلب مساعدة">🆘 طلب مساعدة</option>
+                        <option value="مقترح">💡 مقترح</option>
+                        <option value="مشكلة">⚠️ مشكلة</option>
+                        <option value="طلب رمز ترقية">🎫 طلب رمز ترقية</option>
+                        <option value="استفسار">❓ استفسار</option>
+                    </select>
+                </div>
+                
+                <div>
+                    <label for="messageContent" class="block text-sm mb-2">محتوى الرسالة</label>
+                    <textarea id="messageContent" class="input-style w-full px-4 py-3 rounded-xl h-40 resize-none" placeholder="اكتب رسالتك هنا..."></textarea>
+                </div>
+            </div>
+            
+            <div class="flex gap-3 mt-6">
+                <button onclick="closeModal('messageAdminModal')" class="btn-secondary flex-1 py-3 rounded-xl">إلغاء</button>
+                <button onclick="sendMessageToAdmin()" class="btn-primary flex-1 py-3 rounded-xl">إرسال الرسالة</button>
             </div>
         </div>
     </div>
@@ -699,6 +831,12 @@
                         <span>العبارات الملهمة</span>
                     </button>
                     
+                    <!-- New Section: Skills Development -->
+                    <button onclick="navigateTo('skills')" class="sidebar-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-right" data-page="skills">
+                        <span class="text-xl">🚀</span>
+                        <span>تطوير المهارات</span>
+                    </button>
+                    
                     <button onclick="navigateTo('suggestions')" class="sidebar-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-right position-relative" data-page="suggestions">
                         <span class="text-xl">📝</span>
                         <span>الاقتراحات</span>
@@ -710,6 +848,19 @@
                         <span>عن المشروع</span>
                     </button>
                     
+                    <!-- Button for regular users to message admin -->
+                    <div id="userMessageButton" class="hidden">
+                        <button onclick="openMessageAdminModal()" class="sidebar-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-right">
+                            <span class="text-xl">📨</span>
+                            <span>مراسلة المدير</span>
+                        </button>
+                        
+                        <button onclick="openRequestCodeModal()" class="sidebar-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-right">
+                            <span class="text-xl">🎫</span>
+                            <span>طلب رمز ترقية</span>
+                        </button>
+                    </div>
+                    
                     <div id="adminMenuItems" class="hidden space-y-2">
                         <div class="border-t border-white/10 my-4 pt-4">
                             <p class="text-xs text-gray-500 px-4 mb-2">إدارة النظام</p>
@@ -718,6 +869,12 @@
                         <button onclick="navigateTo('members')" class="sidebar-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-right" data-page="members">
                             <span class="text-xl">👥</span>
                             <span>الأعضاء</span>
+                        </button>
+                        
+                        <button onclick="navigateTo('messages')" class="sidebar-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-right" data-page="messages">
+                            <span class="text-xl">📨</span>
+                            <span>الرسائل</span>
+                            <span id="adminMessagesBadge" class="badge text-xs px-2 py-0.5 rounded-full mr-auto hidden">0</span>
                         </button>
                         
                         <button onclick="navigateTo('codes')" class="sidebar-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-right" data-page="codes">
@@ -741,6 +898,7 @@
                             <div class="flex-1 min-w-0">
                                 <p class="font-bold text-sm truncate" id="currentUserName">المستخدم</p>
                                 <p class="text-xs text-gray-400 truncate" id="currentUserSpecialty">التخصص</p>
+                                <div id="userStatus" class="text-xs mt-1"></div>
                             </div>
                         </div>
                     </div>
@@ -929,6 +1087,40 @@
                     
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="quotesGrid">
                         <!-- Quotes will be rendered here -->
+                    </div>
+                </div>
+                
+                <!-- Skills Development Page -->
+                <div id="skillsPage" class="page-content hidden animate-fade-in">
+                    <div class="flex items-center justify-between mb-6 flex-wrap gap-4">
+                        <div>
+                            <h2 class="text-3xl font-bold">🚀 تطوير المهارات</h2>
+                            <p class="text-gray-400 mt-1">أفضل القنوات والكورسات لتطوير مهاراتك</p>
+                        </div>
+                        <button id="addCourseBtn" onclick="openAddCourseModal()" class="btn-primary px-6 py-3 rounded-xl flex items-center gap-2">
+                            <span>➕</span>
+                            <span>إضافة مصدر</span>
+                        </button>
+                    </div>
+                    
+                    <!-- Filters -->
+                    <div class="flex flex-wrap gap-2 mb-6">
+                        <button onclick="filterCourses('all')" class="filter-btn active category-tag px-4 py-2 rounded-full text-sm" data-filter="all">الكل</button>
+                        <button onclick="filterCourses('قناة يوتيوب')" class="filter-btn category-tag px-4 py-2 rounded-full text-sm" data-filter="قناة يوتيوب">📺 يوتيوب</button>
+                        <button onclick="filterCourses('كورس أونلاين')" class="filter-btn category-tag px-4 py-2 rounded-full text-sm" data-filter="كورس أونلاين">🎓 كورسات</button>
+                        <button onclick="filterCourses('منصة تعليمية')" class="filter-btn category-tag px-4 py-2 rounded-full text-sm" data-filter="منصة تعليمية">💻 منصات</button>
+                        <button onclick="filterCourses('مقالات')" class="filter-btn category-tag px-4 py-2 rounded-full text-sm" data-filter="مقالات">📝 مقالات</button>
+                        <button onclick="filterCourses('كتب')" class="filter-btn category-tag px-4 py-2 rounded-full text-sm" data-filter="كتب">📚 كتب</button>
+                        <button onclick="filterCourses('بودكاست')" class="filter-btn category-tag px-4 py-2 rounded-full text-sm" data-filter="بودكاست">🎙️ بودكاست</button>
+                    </div>
+                    
+                    <!-- Courses Grid -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="coursesGrid">
+                        <div class="course-card glass-card rounded-xl p-6 text-center text-gray-400">
+                            <p class="text-5xl mb-4">🚀</p>
+                            <p>لا توجد مصادر تعليمية حتى الآن</p>
+                            <p class="text-sm mt-2">أضف أول مصدر تعليمي!</p>
+                        </div>
                     </div>
                 </div>
                 
@@ -1158,7 +1350,7 @@
                         <div class="glass-card rounded-2xl p-6">
                             <h3 class="text-xl font-bold mb-4 flex items-center gap-2">
                                 <span>👑</span>
-                                <span>المدراء</span>
+                                <span>المدراء (عددهم: <span id="adminCount">0</span>)</span>
                             </h3>
                             <div id="adminMembersList" class="space-y-3">
                                 <p class="text-gray-400 text-center">لا يوجد مدراء</p>
@@ -1184,6 +1376,55 @@
                             </h3>
                             <div id="regularMembersList" class="space-y-3">
                                 <p class="text-gray-400 text-center">لا يوجد أعضاء</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Messages Page (Admin Only) -->
+                <div id="messagesPage" class="page-content hidden animate-fade-in">
+                    <div class="mb-6">
+                        <h2 class="text-3xl font-bold">📨 رسائل الأعضاء</h2>
+                        <p class="text-gray-400 mt-1">الرسائل وطلبات الرموز من الأعضاء</p>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <div class="lg:col-span-2">
+                            <!-- Messages List -->
+                            <div id="messagesList" class="space-y-4">
+                                <div class="glass-card rounded-xl p-6 text-center text-gray-400">
+                                    <p>لا توجد رسائل حتى الآن</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="space-y-6">
+                            <!-- Statistics -->
+                            <div class="glass-card rounded-2xl p-6">
+                                <h3 class="text-lg font-bold mb-4">📊 إحصائيات الرسائل</h3>
+                                <div class="space-y-3">
+                                    <div class="flex justify-between items-center py-2 border-b border-white/10">
+                                        <span class="text-gray-400">الرسائل الجديدة</span>
+                                        <span class="font-bold text-yellow-400" id="newMessagesCount">0</span>
+                                    </div>
+                                    <div class="flex justify-between items-center py-2 border-b border-white/10">
+                                        <span class="text-gray-400">طلبات الرموز</span>
+                                        <span class="font-bold text-green-400" id="codeRequestsCount">0</span>
+                                    </div>
+                                    <div class="flex justify-between items-center py-2">
+                                        <span class="text-gray-400">إجمالي الرسائل</span>
+                                        <span class="font-bold" id="totalMessagesCount">0</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Actions -->
+                            <div class="glass-card rounded-2xl p-6">
+                                <h3 class="text-lg font-bold mb-4">⚡ إجراءات سريعة</h3>
+                                <div class="space-y-3">
+                                    <button onclick="generateCodeForMessage()" class="btn-primary w-full py-3 rounded-xl">🎫 إنشاء رمز جديد</button>
+                                    <button onclick="markAllMessagesAsRead()" class="btn-secondary w-full py-3 rounded-xl">📭 تعيين الكل كمقروء</button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -1234,8 +1475,12 @@
                                     <span class="font-bold" id="settingsMembersCount">0</span>
                                 </div>
                                 <div class="flex justify-between items-center py-2 border-b border-white/10">
-                                    <span class="text-gray-400">الاقتراحات المعلقة</span>
-                                    <span class="font-bold" id="settingsSuggestionsCount">0</span>
+                                    <span class="text-gray-400">عدد المدراء</span>
+                                    <span class="font-bold" id="settingsAdminsCount">0</span>
+                                </div>
+                                <div class="flex justify-between items-center py-2 border-b border-white/10">
+                                    <span class="text-gray-400">الرسائل غير المقروءة</span>
+                                    <span class="font-bold" id="settingsUnreadMessages">0</span>
                                 </div>
                                 <div class="flex justify-between items-center py-2">
                                     <span class="text-gray-400">رموز الترقية النشطة</span>
@@ -1298,11 +1543,14 @@
             content: [],
             suggestions: [],
             codes: [],
-            quotes: [] // Added quotes array
+            quotes: [],
+            messages: [], // New: messages from users to admin
+            courses: []   // New: courses and channels
         };
         let currentUser = null;
         let currentPage = 'home';
         let currentFilter = 'all';
+        let currentCourseFilter = 'all';
         let confirmAction = null;
         let viewedIdeas = new Set();
 
@@ -1337,6 +1585,16 @@
             'علوم': '🔬',
             'فن': '🎨',
             'اجتماع': '👥'
+        };
+
+        // Course Type Icons
+        const COURSE_ICONS = {
+            'قناة يوتيوب': '📺',
+            'كورس أونلاين': '🎓',
+            'منصة تعليمية': '💻',
+            'مقالات': '📝',
+            'كتب': '📚',
+            'بودكاست': '🎙️'
         };
 
         // Initialize App
@@ -1442,6 +1700,17 @@
             spinner.classList.remove('hidden');
             
             try {
+                // Check if user is banned
+                const bannedUsers = appData.users.filter(u => u.isBanned);
+                const isBanned = bannedUsers.some(u => u.name === name);
+                
+                if (isBanned) {
+                    showToast('هذا الحساب محظور من قبل المدير', 'error');
+                    btnText.classList.remove('hidden');
+                    spinner.classList.add('hidden');
+                    return;
+                }
+                
                 // Check if admin
                 const isAdmin = ADMINS.some(a => a.name === name && a.specialty === specialty);
                 
@@ -1489,6 +1758,7 @@
                         specialty: userData.specialty,
                         role: role,
                         upgradeCode: upgradeCode,
+                        isBanned: userData.isBanned || false,
                         authMethod: 'traditional'
                     };
                 } else {
@@ -1498,6 +1768,7 @@
                         specialty: role === 'premium' ? 'عضو مميز' : (specialty || 'مستخدم'),
                         role,
                         upgradeCode: upgradeCode || '',
+                        isBanned: false,
                         authMethod: 'traditional',
                         createdAt: new Date().toISOString()
                     };
@@ -1600,6 +1871,7 @@
                         specialty: specialty || 'مستخدم',
                         role: 'user',
                         upgradeCode: '',
+                        isBanned: false,
                         authMethod: 'email',
                         email: email,
                         emailVerified: false,
@@ -1660,6 +1932,14 @@
                 if (userDoc.exists) {
                     // Existing user
                     const userData = userDoc.data();
+                    
+                    // Check if user is banned
+                    if (userData.isBanned) {
+                        showToast('هذا الحساب محظور من قبل المدير', 'error');
+                        await auth.signOut();
+                        return;
+                    }
+                    
                     currentUser = {
                         id: firebaseUser.uid,
                         ...userData,
@@ -1692,6 +1972,7 @@
                         specialty,
                         role: 'user',
                         upgradeCode: '',
+                        isBanned: false,
                         authMethod: firebaseUser.providerData[0].providerId,
                         email: firebaseUser.email,
                         emailVerified: firebaseUser.emailVerified,
@@ -1730,7 +2011,9 @@
                     db.collection('content').get(),
                     db.collection('suggestions').get(),
                     db.collection('codes').get(),
-                    db.collection('quotes').get() // Load quotes from Firestore
+                    db.collection('quotes').get(),
+                    db.collection('messages').get(), // Load messages
+                    db.collection('courses').get()   // Load courses
                 ];
 
                 const results = await Promise.all(promises);
@@ -1741,7 +2024,9 @@
                     content: results[2].docs.map(doc => ({ id: doc.id, ...doc.data() })),
                     suggestions: results[3].docs.map(doc => ({ id: doc.id, ...doc.data() })),
                     codes: results[4].docs.map(doc => ({ id: doc.id, ...doc.data() })),
-                    quotes: results[5].docs.map(doc => ({ id: doc.id, ...doc.data() }))
+                    quotes: results[5].docs.map(doc => ({ id: doc.id, ...doc.data() })),
+                    messages: results[6].docs.map(doc => ({ id: doc.id, ...doc.data() })),
+                    courses: results[7].docs.map(doc => ({ id: doc.id, ...doc.data() }))
                 };
 
                 // Set up real-time listeners
@@ -1803,6 +2088,39 @@
                     updateUI();
                 }
             });
+
+            // Listen for messages changes
+            db.collection('messages').onSnapshot((snapshot) => {
+                appData.messages = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                if (currentPage === 'messages' || currentPage === 'settings') {
+                    updateUI();
+                }
+                // Update badge for admin
+                updateMessagesBadge();
+            });
+
+            // Listen for courses changes
+            db.collection('courses').onSnapshot((snapshot) => {
+                appData.courses = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                if (currentPage === 'skills') {
+                    updateUI();
+                }
+            });
+        }
+
+        // Update messages badge for admin
+        function updateMessagesBadge() {
+            if (!currentUser || currentUser.role !== 'admin') return;
+            
+            const unreadMessages = appData.messages.filter(m => !m.read && m.type !== 'system').length;
+            const badge = document.getElementById('adminMessagesBadge');
+            
+            if (unreadMessages > 0) {
+                badge.textContent = unreadMessages;
+                badge.classList.remove('hidden');
+            } else {
+                badge.classList.add('hidden');
+            }
         }
 
         // Open Add Idea Modal
@@ -1841,6 +2159,7 @@
                     likes: 0,
                     likedBy: '',
                     featured: false,
+                    deleted: false, // New field for soft delete
                     createdAt: new Date().toISOString()
                 };
                 
@@ -1902,11 +2221,244 @@
             }
         }
 
+        // Open Add Course Modal
+        function openAddCourseModal() {
+            if (currentUser && (currentUser.role === 'admin' || currentUser.role === 'premium')) {
+                document.getElementById('addCourseModal').classList.remove('hidden');
+            } else {
+                showToast('لا تملك صلاحية إضافة مصادر تعليمية.', 'error');
+            }
+        }
+
+        // Submit New Course
+        async function submitNewCourse() {
+            const title = document.getElementById('newCourseTitle').value.trim();
+            const type = document.getElementById('newCourseType').value;
+            const description = document.getElementById('newCourseDescription').value.trim();
+            const link = document.getElementById('newCourseLink').value.trim();
+            
+            if (!title || !description) {
+                showToast('يرجى ملء العنوان والوصف', 'error');
+                return;
+            }
+            
+            try {
+                const courseData = {
+                    title,
+                    type,
+                    description,
+                    link: link || '',
+                    addedBy: currentUser.name,
+                    addedByRole: currentUser.role,
+                    createdAt: new Date().toISOString()
+                };
+                
+                await db.collection('courses').add(courseData);
+                
+                // Close modal and clear fields
+                closeModal('addCourseModal');
+                document.getElementById('newCourseTitle').value = '';
+                document.getElementById('newCourseDescription').value = '';
+                document.getElementById('newCourseLink').value = '';
+                
+                showToast('تمت إضافة المصدر التعليمي بنجاح!', 'success');
+                
+            } catch (error) {
+                console.error('Error adding course:', error);
+                showToast('حدث خطأ أثناء إضافة المصدر التعليمي', 'error');
+            }
+        }
+
+        // Open Message Admin Modal
+        function openMessageAdminModal() {
+            if (currentUser && currentUser.role === 'user') {
+                document.getElementById('messageAdminModal').classList.remove('hidden');
+            }
+        }
+
+        // Open Request Code Modal (for regular users)
+        function openRequestCodeModal() {
+            if (currentUser && currentUser.role === 'user') {
+                // Pre-fill the message for code request
+                document.getElementById('messageTitle').value = 'طلب رمز ترقية';
+                document.getElementById('messageType').value = 'طلب رمز ترقية';
+                document.getElementById('messageContent').value = 'أود طلب رمز ترقية لتصبح عضوية مميزة. شكراً.';
+                document.getElementById('messageAdminModal').classList.remove('hidden');
+            }
+        }
+
+        // Send Message to Admin
+        async function sendMessageToAdmin() {
+            const title = document.getElementById('messageTitle').value.trim();
+            const type = document.getElementById('messageType').value;
+            const content = document.getElementById('messageContent').value.trim();
+            
+            if (!title || !content) {
+                showToast('يرجى ملء جميع الحقول', 'error');
+                return;
+            }
+            
+            try {
+                const messageData = {
+                    title,
+                    type,
+                    content,
+                    from: currentUser.name,
+                    fromId: currentUser.id,
+                    read: false,
+                    createdAt: new Date().toISOString()
+                };
+                
+                await db.collection('messages').add(messageData);
+                
+                // Close modal and clear fields
+                closeModal('messageAdminModal');
+                document.getElementById('messageTitle').value = '';
+                document.getElementById('messageContent').value = '';
+                
+                showToast('تم إرسال رسالتك إلى المدير بنجاح!', 'success');
+                
+            } catch (error) {
+                console.error('Error sending message:', error);
+                showToast('حدث خطأ أثناء إرسال الرسالة', 'error');
+            }
+        }
+
         // Open Add Content Modal
         function openAddContentModal() {
             if (currentUser && currentUser.role === 'admin') {
                 // Implement modal opening logic
                 showToast('ميزة إضافة المحتوى قيد التطوير', 'info');
+            }
+        }
+
+        // Delete Idea (Admin only)
+        async function deleteIdea(ideaId) {
+            if (!currentUser || currentUser.role !== 'admin') {
+                showToast('لا تملك صلاحية حذف الأفكار', 'error');
+                return;
+            }
+            
+            confirmAction = async () => {
+                try {
+                    await db.collection('ideas').doc(ideaId).update({
+                        deleted: true,
+                        deletedAt: new Date().toISOString(),
+                        deletedBy: currentUser.name
+                    });
+                    showToast('تم حذف الفكرة بنجاح', 'success');
+                } catch (error) {
+                    console.error('Error deleting idea:', error);
+                    showToast('خطأ في حذف الفكرة', 'error');
+                }
+            };
+            showConfirmModal('حذف الفكرة', 'هل أنت متأكد من حذف هذه الفكرة؟');
+        }
+
+        // Delete Course (Admin or Premium only)
+        async function deleteCourse(courseId) {
+            if (!currentUser || (currentUser.role !== 'admin' && currentUser.role !== 'premium')) {
+                showToast('لا تملك صلاحية حذف المصادر التعليمية', 'error');
+                return;
+            }
+            
+            confirmAction = async () => {
+                try {
+                    await db.collection('courses').doc(courseId).delete();
+                    showToast('تم حذف المصدر التعليمي بنجاح', 'success');
+                } catch (error) {
+                    console.error('Error deleting course:', error);
+                    showToast('خطأ في حذف المصدر التعليمي', 'error');
+                }
+            };
+            showConfirmModal('حذف المصدر التعليمي', 'هل أنت متأكد من حذف هذا المصدر التعليمي؟');
+        }
+
+        // Ban/Unban User (Admin only)
+        async function toggleBanUser(userId, isCurrentlyBanned) {
+            if (!currentUser || currentUser.role !== 'admin') {
+                showToast('لا تملك صلاحية حظر المستخدمين', 'error');
+                return;
+            }
+            
+            const action = isCurrentlyBanned ? 'فك الحظر' : 'حظر';
+            
+            confirmAction = async () => {
+                try {
+                    await db.collection('users').doc(userId).update({
+                        isBanned: !isCurrentlyBanned,
+                        bannedAt: !isCurrentlyBanned ? new Date().toISOString() : null,
+                        bannedBy: !isCurrentlyBanned ? currentUser.name : null
+                    });
+                    
+                    showToast(`تم ${action} المستخدم بنجاح`, 'success');
+                    
+                    // If banning current user, log them out
+                    if (!isCurrentlyBanned && currentUser.id === userId) {
+                        await handleLogout();
+                    }
+                    
+                } catch (error) {
+                    console.error('Error toggling user ban:', error);
+                    showToast(`خطأ في ${action} المستخدم`, 'error');
+                }
+            };
+            showConfirmModal(`${action} المستخدم`, `هل أنت متأكد من ${action} هذا المستخدم؟`);
+        }
+
+        // Mark Message as Read (Admin only)
+        async function markMessageAsRead(messageId) {
+            if (!currentUser || currentUser.role !== 'admin') return;
+            
+            try {
+                await db.collection('messages').doc(messageId).update({
+                    read: true,
+                    readAt: new Date().toISOString()
+                });
+            } catch (error) {
+                console.error('Error marking message as read:', error);
+            }
+        }
+
+        // Mark all messages as read (Admin only)
+        async function markAllMessagesAsRead() {
+            if (!currentUser || currentUser.role !== 'admin') return;
+            
+            try {
+                const unreadMessages = appData.messages.filter(m => !m.read);
+                const updatePromises = unreadMessages.map(msg => 
+                    db.collection('messages').doc(msg.id).update({
+                        read: true,
+                        readAt: new Date().toISOString()
+                    })
+                );
+                
+                await Promise.all(updatePromises);
+                showToast('تم تعيين جميع الرسائل كمقروءة', 'success');
+            } catch (error) {
+                console.error('Error marking all messages as read:', error);
+                showToast('خطأ في تعيين الرسائل كمقروءة', 'error');
+            }
+        }
+
+        // Generate code for message response
+        async function generateCodeForMessage() {
+            const code = 'MUF-' + Math.random().toString(36).substring(2, 8).toUpperCase();
+            
+            try {
+                const codeData = {
+                    code,
+                    usedBy: '',
+                    usedAt: '',
+                    createdAt: new Date().toISOString(),
+                    generatedFor: 'رسالة'
+                };
+                
+                await db.collection('codes').add(codeData);
+                showToast(`تم إنشاء الرمز: ${code} 🎫`, 'success');
+            } catch (error) {
+                console.error('Error generating code:', error);
+                showToast('خطأ في إنشاء الرمز', 'error');
             }
         }
 
@@ -1969,12 +2521,25 @@
                 const roleMap = { admin: 'مدير', premium: 'عضو مميز', user: 'عضو' };
                 document.getElementById('userRoleDisplay').textContent = roleMap[currentUser.role] || 'عضو';
                 
-                // Show/hide admin menu and buttons
-                const isAdminOrPremium = currentUser.role === 'admin' || currentUser.role === 'premium';
-                document.getElementById('adminMenuItems').classList.toggle('hidden', currentUser.role !== 'admin');
-                document.getElementById('addIdeaBtn').classList.toggle('hidden', !isAdminOrPremium);
-                document.getElementById('addContentBtn').classList.toggle('hidden', currentUser.role !== 'admin');
-                document.getElementById('addQuoteBtn').classList.toggle('hidden', !isAdminOrPremium);
+                // Show user status (banned)
+                const statusElement = document.getElementById('userStatus');
+                if (currentUser.isBanned) {
+                    statusElement.innerHTML = '<span class="text-red-400">🚫 محظور</span>';
+                } else {
+                    statusElement.innerHTML = '<span class="text-green-400">✅ نشط</span>';
+                }
+                
+                // Show/hide buttons based on role
+                const isAdmin = currentUser.role === 'admin';
+                const isPremium = currentUser.role === 'premium';
+                const isRegularUser = currentUser.role === 'user';
+                
+                document.getElementById('adminMenuItems').classList.toggle('hidden', !isAdmin);
+                document.getElementById('addIdeaBtn').classList.toggle('hidden', !(isAdmin || isPremium));
+                document.getElementById('addContentBtn').classList.toggle('hidden', !isAdmin);
+                document.getElementById('addQuoteBtn').classList.toggle('hidden', !(isAdmin || isPremium));
+                document.getElementById('addCourseBtn').classList.toggle('hidden', !(isAdmin || isPremium));
+                document.getElementById('userMessageButton').classList.toggle('hidden', !isRegularUser);
             }
             
             navigateTo('home');
@@ -2023,29 +2588,33 @@
             updateContentGrid();
             updateSuggestions();
             updateMembers();
+            updateMessages();
+            updateCourses();
             updateCodes();
             updateSettings();
-            renderQuotes(); // Update quotes display
+            renderQuotes();
         }
 
         // Update Stats
         function updateStats() {
-            const totalViews = appData.ideas.reduce((sum, i) => sum + (i.views || 0), 0);
-            const totalLikes = appData.ideas.reduce((sum, i) => sum + (i.likes || 0), 0);
+            // Filter out deleted ideas
+            const activeIdeas = appData.ideas.filter(i => !i.deleted);
+            const totalViews = activeIdeas.reduce((sum, i) => sum + (i.views || 0), 0);
+            const totalLikes = activeIdeas.reduce((sum, i) => sum + (i.likes || 0), 0);
             
-            document.getElementById('totalIdeas').textContent = appData.ideas.length;
+            document.getElementById('totalIdeas').textContent = activeIdeas.length;
             document.getElementById('totalViews').textContent = totalViews;
             document.getElementById('totalMembers').textContent = appData.users.length;
             document.getElementById('totalInteractions').textContent = totalLikes;
             
             // Update suggestions badge
             const pendingSuggestions = appData.suggestions.filter(s => s.status === 'pending').length;
-            const badge = document.getElementById('suggestionsBadge');
+            const suggestionsBadge = document.getElementById('suggestionsBadge');
             if (currentUser && currentUser.role === 'admin' && pendingSuggestions > 0) {
-                badge.textContent = pendingSuggestions;
-                badge.classList.remove('hidden');
+                suggestionsBadge.textContent = pendingSuggestions;
+                suggestionsBadge.classList.remove('hidden');
             } else {
-                badge.classList.add('hidden');
+                suggestionsBadge.classList.add('hidden');
             }
         }
 
@@ -2103,17 +2672,38 @@
                         <p class="font-amiri text-lg leading-relaxed mb-3">"${quote.text}"</p>
                         <p class="text-pink-300 text-sm">— ${quote.author}</p>
                         ${addedByText}
+                        ${currentUser && currentUser.role === 'admin' && !quote.isDefault ? `
+                            <div class="mt-2 text-left">
+                                <button onclick="deleteQuote('${quote.id}')" class="text-red-400 hover:text-red-300 text-sm">🗑️ حذف</button>
+                            </div>
+                        ` : ''}
                     </div>
                 `;
             }).join('');
         }
 
+        // Delete Quote (Admin only)
+        async function deleteQuote(quoteId) {
+            if (!currentUser || currentUser.role !== 'admin') return;
+            
+            confirmAction = async () => {
+                try {
+                    await db.collection('quotes').doc(quoteId).delete();
+                    showToast('تم حذف العبارة بنجاح', 'success');
+                } catch (error) {
+                    console.error('Error deleting quote:', error);
+                    showToast('خطأ في حذف العبارة', 'error');
+                }
+            };
+            showConfirmModal('حذف العبارة', 'هل أنت متأكد من حذف هذه العبارة؟');
+        }
+
         // Update Latest Ideas
         function updateLatestIdeas() {
-            // Sort ideas by creation date (newest first)
-            const sortedIdeas = [...appData.ideas].sort((a, b) => {
-                return new Date(b.createdAt) - new Date(a.createdAt);
-            });
+            // Filter out deleted ideas and sort by creation date (newest first)
+            const sortedIdeas = appData.ideas
+                .filter(i => !i.deleted)
+                .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
             
             const ideas = sortedIdeas.slice(0, 3); // Get latest 3 ideas
             const grid = document.getElementById('latestIdeasGrid');
@@ -2134,12 +2724,10 @@
 
         // Update Ideas Grid
         function updateIdeasGrid() {
-            let ideas = [...appData.ideas];
-            
-            // Sort by creation date (newest first)
-            ideas.sort((a, b) => {
-                return new Date(b.createdAt) - new Date(a.createdAt);
-            });
+            // Filter out deleted ideas and sort by creation date (newest first)
+            let ideas = appData.ideas
+                .filter(i => !i.deleted)
+                .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
             
             if (currentFilter !== 'all') {
                 ideas = ideas.filter(i => i.category === currentFilter);
@@ -2172,8 +2760,16 @@
             const roleIcons = { admin: '👑', premium: '💡', user: '👤' };
             const roleIcon = roleIcons[idea.authorRole] || '👤';
             
+            // Add delete button for admin
+            const deleteButton = currentUser && currentUser.role === 'admin' ? `
+                <div class="absolute left-3 top-3">
+                    <button onclick="deleteIdea('${idea.id}')" class="text-red-400 hover:text-red-300 text-sm">🗑️</button>
+                </div>
+            ` : '';
+            
             return `
-                <div class="glass-card rounded-xl p-5 card-hover animate-fade-in">
+                <div class="glass-card rounded-xl p-5 card-hover animate-fade-in relative">
+                    ${deleteButton}
                     <div class="flex items-start justify-between mb-3">
                         <span class="category-tag px-3 py-1 rounded-full text-xs">${icon} ${idea.category}</span>
                         ${idea.featured ? '<span class="text-yellow-400 text-xl">⭐</span>' : ''}
@@ -2203,6 +2799,22 @@
             });
             
             updateIdeasGrid();
+        }
+
+        // Filter Courses
+        function filterCourses(filter) {
+            currentCourseFilter = filter;
+            
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                if (btn.closest('#skillsPage')) {
+                    btn.classList.remove('active');
+                    if (btn.dataset.filter === filter) {
+                        btn.classList.add('active');
+                    }
+                }
+            });
+            
+            updateCourses();
         }
 
         // Update Content Grid
@@ -2372,76 +2984,103 @@
             const adminList = document.getElementById('adminMembersList');
             const premiumList = document.getElementById('premiumMembersList');
             const regularList = document.getElementById('regularMembersList');
+            const adminCount = document.getElementById('adminCount');
             
             if (!adminList || !premiumList || !regularList) return;
             
+            adminCount.textContent = adminUsers.length;
+            
             const formatDate = (dateStr) => {
+                if (!dateStr) return 'غير محدد';
                 const date = new Date(dateStr);
                 return date.toLocaleDateString('ar-EG', { year: 'numeric', month: 'short', day: 'numeric' });
             };
             
+            // Render Admins
             if (adminUsers.length === 0) {
                 adminList.innerHTML = '<p class="text-gray-400 text-center">لا يوجد مدراء</p>';
             } else {
                 adminList.innerHTML = adminUsers.map(u => `
-                    <div class="glass-card rounded-xl p-4 flex items-center justify-between">
+                    <div class="glass-card rounded-xl p-4 flex items-center justify-between ${u.isBanned ? 'banned-user' : ''}">
                         <div class="flex items-center gap-3">
                             <span class="text-3xl">👑</span>
                             <div>
                                 <p class="font-bold flex items-center gap-2">
                                     ${u.name}
                                     <span class="role-badge role-admin">مدير</span>
+                                    ${u.isBanned ? '<span class="text-red-400 text-xs">🚫 محظور</span>' : ''}
                                 </p>
                                 <p class="text-sm text-gray-400">${u.specialty}</p>
                                 <p class="text-xs text-gray-500">انضم في ${formatDate(u.createdAt)}</p>
                             </div>
                         </div>
+                        ${currentUser && currentUser.role === 'admin' && u.id !== currentUser.id ? `
+                            <div class="flex gap-2">
+                                <button onclick="toggleBanUser('${u.id}', ${u.isBanned})" class="text-${u.isBanned ? 'green' : 'red'}-400 hover:text-${u.isBanned ? 'green' : 'red'}-300">
+                                    ${u.isBanned ? '🚫 فك الحظر' : '🚫 حظر'}
+                                </button>
+                            </div>
+                        ` : ''}
                     </div>
                 `).join('');
             }
             
+            // Render Premium Members
             if (premiumUsers.length === 0) {
                 premiumList.innerHTML = '<p class="text-gray-400 text-center">لا يوجد أعضاء مميزون</p>';
             } else {
                 premiumList.innerHTML = premiumUsers.map(u => `
-                    <div class="glass-card rounded-xl p-4 flex items-center justify-between">
+                    <div class="glass-card rounded-xl p-4 flex items-center justify-between ${u.isBanned ? 'banned-user' : ''}">
                         <div class="flex items-center gap-3">
                             <span class="text-2xl">💡</span>
                             <div>
                                 <p class="font-bold flex items-center gap-2">
                                     ${u.name}
                                     <span class="role-badge role-premium">مميز</span>
+                                    ${u.isBanned ? '<span class="text-red-400 text-xs">🚫 محظور</span>' : ''}
                                 </p>
                                 <p class="text-sm text-gray-400">${u.specialty}</p>
                                 ${u.upgradeCode ? `<p class="text-xs text-indigo-400">رمز الترقية: ${u.upgradeCode}</p>` : ''}
                                 <p class="text-xs text-gray-500">انضم في ${formatDate(u.createdAt)}</p>
                             </div>
                         </div>
-                        ${currentUser && currentUser.role === 'admin' && u.name !== currentUser.name ? `
-                            <button onclick="deleteMember('${u.id}')" class="text-red-400 hover:text-red-300">🗑️</button>
+                        ${currentUser && currentUser.role === 'admin' ? `
+                            <div class="flex gap-2">
+                                <button onclick="toggleBanUser('${u.id}', ${u.isBanned})" class="text-${u.isBanned ? 'green' : 'red'}-400 hover:text-${u.isBanned ? 'green' : 'red'}-300">
+                                    ${u.isBanned ? '🚫 فك الحظر' : '🚫 حظر'}
+                                </button>
+                                <button onclick="deleteMember('${u.id}')" class="text-red-400 hover:text-red-300">🗑️</button>
+                            </div>
                         ` : ''}
                     </div>
                 `).join('');
             }
             
+            // Render Regular Members
             if (regularUsers.length === 0) {
                 regularList.innerHTML = '<p class="text-gray-400 text-center">لا يوجد أعضاء</p>';
             } else {
                 regularList.innerHTML = regularUsers.map(u => `
-                    <div class="glass-card rounded-xl p-4 flex items-center justify-between">
+                    <div class="glass-card rounded-xl p-4 flex items-center justify-between ${u.isBanned ? 'banned-user' : ''}">
                         <div class="flex items-center gap-3">
                             <span class="text-2xl">👤</span>
                             <div>
                                 <p class="font-bold flex items-center gap-2">
                                     ${u.name}
                                     <span class="role-badge role-user">عادي</span>
+                                    ${u.isBanned ? '<span class="text-red-400 text-xs">🚫 محظور</span>' : ''}
                                 </p>
                                 <p class="text-sm text-gray-400">${u.specialty}</p>
                                 <p class="text-xs text-gray-500">انضم في ${formatDate(u.createdAt)}</p>
                             </div>
                         </div>
                         ${currentUser && currentUser.role === 'admin' ? `
-                            <button onclick="deleteMember('${u.id}')" class="text-red-400 hover:text-red-300">🗑️</button>
+                            <div class="flex gap-2">
+                                <button onclick="toggleBanUser('${u.id}', ${u.isBanned})" class="text-${u.isBanned ? 'green' : 'red'}-400 hover:text-${u.isBanned ? 'green' : 'red'}-300">
+                                    ${u.isBanned ? '🚫 فك الحظر' : '🚫 حظر'}
+                                </button>
+                                <button onclick="deleteMember('${u.id}')" class="text-red-400 hover:text-red-300">🗑️</button>
+                            </div>
                         ` : ''}
                     </div>
                 `).join('');
@@ -2462,6 +3101,131 @@
             showConfirmModal('حذف العضو', 'هل أنت متأكد من حذف هذا العضو؟ سيتم حذف جميع بياناته.');
         }
 
+        // Update Messages
+        function updateMessages() {
+            const list = document.getElementById('messagesList');
+            const newMessagesCount = document.getElementById('newMessagesCount');
+            const totalMessagesCount = document.getElementById('totalMessagesCount');
+            const codeRequestsCount = document.getElementById('codeRequestsCount');
+            
+            if (!list || !newMessagesCount || !totalMessagesCount || !codeRequestsCount) return;
+            
+            // Sort messages by date (newest first)
+            const messages = [...appData.messages].sort((a, b) => 
+                new Date(b.createdAt) - new Date(a.createdAt)
+            );
+            
+            const unreadMessages = messages.filter(m => !m.read && m.type !== 'system');
+            const codeRequests = messages.filter(m => m.type === 'طلب رمز ترقية');
+            
+            newMessagesCount.textContent = unreadMessages.length;
+            totalMessagesCount.textContent = messages.length;
+            codeRequestsCount.textContent = codeRequests.length;
+            
+            if (messages.length === 0) {
+                list.innerHTML = `
+                    <div class="glass-card rounded-xl p-6 text-center text-gray-400">
+                        <p>لا توجد رسائل حتى الآن</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            list.innerHTML = messages.map(msg => {
+                const isUnread = !msg.read;
+                const messageTypeIcon = {
+                    'طلب مساعدة': '🆘',
+                    'مقترح': '💡',
+                    'مشكلة': '⚠️',
+                    'طلب رمز ترقية': '🎫',
+                    'استفسار': '❓'
+                }[msg.type] || '📨';
+                
+                return `
+                    <div class="glass-card rounded-xl p-5 card-hover ${isUnread ? 'border-r-4 border-yellow-500' : ''}">
+                        <div class="flex items-start justify-between mb-3 flex-wrap gap-2">
+                            <div class="flex items-center gap-2">
+                                <span class="text-xl">${messageTypeIcon}</span>
+                                <span class="font-bold">${msg.title}</span>
+                                ${isUnread ? '<span class="text-yellow-400 text-xs">جديد</span>' : ''}
+                            </div>
+                            <span class="text-xs text-gray-500">${formatDate(msg.createdAt)}</span>
+                        </div>
+                        <p class="text-gray-400 text-sm mb-3">${msg.content}</p>
+                        <div class="flex items-center justify-between text-sm flex-wrap gap-2">
+                            <span class="text-gray-500">من: ${msg.from}</span>
+                            <div class="flex gap-2">
+                                ${isUnread ? `
+                                    <button onclick="markMessageAsRead('${msg.id}')" class="text-blue-400 hover:text-blue-300 px-3 py-1 rounded bg-blue-500/20">📭 قراءة</button>
+                                ` : ''}
+                                ${msg.type === 'طلب رمز ترقية' ? `
+                                    <button onclick="generateCodeForMessage()" class="text-green-400 hover:text-green-300 px-3 py-1 rounded bg-green-500/20">🎫 إنشاء رمز</button>
+                                ` : ''}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Update Courses
+        function updateCourses() {
+            const grid = document.getElementById('coursesGrid');
+            
+            if (!grid) return;
+            
+            // Sort courses by date (newest first)
+            let courses = [...appData.courses].sort((a, b) => 
+                new Date(b.createdAt) - new Date(a.createdAt)
+            );
+            
+            // Filter by type
+            if (currentCourseFilter !== 'all') {
+                courses = courses.filter(c => c.type === currentCourseFilter);
+            }
+            
+            if (courses.length === 0) {
+                grid.innerHTML = `
+                    <div class="course-card glass-card rounded-xl p-6 text-center text-gray-400 col-span-full">
+                        <p class="text-5xl mb-4">🚀</p>
+                        <p>لا توجد مصادر تعليمية ${currentCourseFilter !== 'all' ? 'من هذا النوع' : 'حتى الآن'}</p>
+                        ${currentUser && (currentUser.role === 'admin' || currentUser.role === 'premium') ? '<p class="text-sm mt-2">أضف أول مصدر تعليمي!</p>' : ''}
+                    </div>
+                `;
+                return;
+            }
+            
+            grid.innerHTML = courses.map(course => {
+                const icon = COURSE_ICONS[course.type] || '📚';
+                const isDeletable = currentUser && (currentUser.role === 'admin' || currentUser.role === 'premium');
+                
+                return `
+                    <div class="course-card glass-card rounded-xl p-5 card-hover animate-fade-in">
+                        <div class="flex items-start justify-between mb-3">
+                            <span class="category-tag px-3 py-1 rounded-full text-xs">${icon} ${course.type}</span>
+                            ${isDeletable ? `
+                                <button onclick="deleteCourse('${course.id}')" class="text-red-400 hover:text-red-300 text-sm">🗑️</button>
+                            ` : ''}
+                        </div>
+                        <h4 class="font-bold text-lg mb-2 line-clamp-2">${course.title}</h4>
+                        <p class="text-gray-400 text-sm mb-4 line-clamp-3">${course.description}</p>
+                        ${course.link ? `
+                            <div class="mb-3">
+                                <a href="${course.link}" target="_blank" class="text-blue-400 hover:text-blue-300 text-sm flex items-center gap-1">
+                                    <span>🔗</span>
+                                    <span>زيارة الرابط</span>
+                                </a>
+                            </div>
+                        ` : ''}
+                        <div class="flex items-center justify-between text-sm text-gray-500">
+                            <span>أضافه: ${course.addedBy}</span>
+                            <span class="text-xs">${formatDate(course.createdAt)}</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
         // Update Codes
         function updateCodes() {
             const list = document.getElementById('codesList');
@@ -2474,6 +3238,7 @@
             }
             
             const formatDate = (dateStr) => {
+                if (!dateStr) return 'غير مستخدم';
                 const date = new Date(dateStr);
                 return date.toLocaleDateString('ar-EG', { year: 'numeric', month: 'short', day: 'numeric' });
             };
@@ -2488,6 +3253,7 @@
                                 <p class="text-sm text-green-400">استخدمه: ${c.usedBy}</p>
                                 <p class="text-xs text-gray-500">في: ${formatDate(c.usedAt)}</p>
                             ` : '<p class="text-sm text-yellow-400">⏳ متاح للاستخدام</p>'}
+                            ${c.generatedFor ? `<p class="text-xs text-blue-400">${c.generatedFor}</p>` : ''}
                         </div>
                     </div>
                     ${!c.usedBy ? `
@@ -2550,10 +3316,13 @@
         function updateSettings() {
             const pendingSuggestions = appData.suggestions.filter(s => s.status === 'pending');
             const activeCodes = appData.codes.filter(c => !c.usedBy);
+            const adminUsers = appData.users.filter(u => u.role === 'admin');
+            const unreadMessages = appData.messages.filter(m => !m.read && m.type !== 'system');
             
-            document.getElementById('settingsIdeasCount').textContent = appData.ideas.length;
+            document.getElementById('settingsIdeasCount').textContent = appData.ideas.filter(i => !i.deleted).length;
             document.getElementById('settingsMembersCount').textContent = appData.users.length;
-            document.getElementById('settingsSuggestionsCount').textContent = pendingSuggestions.length;
+            document.getElementById('settingsAdminsCount').textContent = adminUsers.length;
+            document.getElementById('settingsUnreadMessages').textContent = unreadMessages.length;
             document.getElementById('settingsCodesCount').textContent = activeCodes.length;
         }
 
@@ -2562,11 +3331,13 @@
             try {
                 const dataToExport = {
                     users: appData.users,
-                    ideas: appData.ideas,
+                    ideas: appData.ideas.filter(i => !i.deleted),
                     content: appData.content,
                     suggestions: appData.suggestions,
                     codes: appData.codes,
                     quotes: appData.quotes,
+                    messages: appData.messages,
+                    courses: appData.courses,
                     exportDate: new Date().toISOString()
                 };
                 
@@ -2592,9 +3363,11 @@
                     // Delete all documents from all collections
                     const deletePromises = [];
                     
-                    // Delete all ideas
+                    // Delete all ideas (soft deleted ones remain)
                     appData.ideas.forEach(idea => {
-                        deletePromises.push(db.collection('ideas').doc(idea.id).delete());
+                        if (!idea.deleted) {
+                            deletePromises.push(db.collection('ideas').doc(idea.id).delete());
+                        }
                     });
                     
                     // Delete all content
@@ -2619,9 +3392,19 @@
                         }
                     });
                     
-                    // Delete all users except current user
+                    // Delete all messages
+                    appData.messages.forEach(message => {
+                        deletePromises.push(db.collection('messages').doc(message.id).delete());
+                    });
+                    
+                    // Delete all courses
+                    appData.courses.forEach(course => {
+                        deletePromises.push(db.collection('courses').doc(course.id).delete());
+                    });
+                    
+                    // Delete all users except current user and admins
                     appData.users.forEach(user => {
-                        if (user.id !== currentUser.id) {
+                        if (user.id !== currentUser.id && user.role !== 'admin') {
                             deletePromises.push(db.collection('users').doc(user.id).delete());
                         }
                     });
@@ -2636,10 +3419,35 @@
             showConfirmModal('حذف جميع البيانات', 'هل أنت متأكد من حذف جميع البيانات؟ هذا الإجراء لا يمكن التراجع عنه!');
         }
 
+        // Helper function to format dates
+        function formatDate(dateStr) {
+            if (!dateStr) return 'غير محدد';
+            const date = new Date(dateStr);
+            const now = new Date();
+            const diffMs = now - date;
+            const diffMins = Math.floor(diffMs / 60000);
+            const diffHours = Math.floor(diffMs / 3600000);
+            const diffDays = Math.floor(diffMs / 86400000);
+            
+            if (diffMins < 60) {
+                return `قبل ${diffMins} دقيقة`;
+            } else if (diffHours < 24) {
+                return `قبل ${diffHours} ساعة`;
+            } else if (diffDays < 7) {
+                return `قبل ${diffDays} يوم`;
+            } else {
+                return date.toLocaleDateString('ar-EG', { year: 'numeric', month: 'short', day: 'numeric' });
+            }
+        }
+
         // Show Confirm Modal
         function showConfirmModal(title, message) {
-            // Implement confirm modal logic
-            showToast(`${title}: ${message}`, 'info');
+            if (confirm(`${title}\n\n${message}\n\nهل تريد المتابعة؟`)) {
+                if (confirmAction) {
+                    confirmAction();
+                    confirmAction = null;
+                }
+            }
         }
 
         // Show Toast Notification
