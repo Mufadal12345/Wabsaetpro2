@@ -1,0 +1,199 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // ============================================================
+    // دوال مساعدة
+    // ============================================================
+    
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    // دالة التحقق من عدم الحظر - صيغة تعبير منطقي فقط (بدون if)
+    function isNotBanned(userId) {
+      let isTargetDoc = request.path.size() > 0 && request.path[4] == 'users' && request.path[5] == userId;
+      return isTargetDoc ? 
+        (resource == null || (resource.data.isBanned == false && (resource.data.banUntil == null || request.time < resource.data.banUntil))) 
+        : 
+        (!exists(/databases/$(database)/documents/users/$(userId)) || (
+          get(/databases/$(database)/documents/users/$(userId)).data.isBanned == false &&
+          (get(/databases/$(database)/documents/users/$(userId)).data.banUntil == null || request.time < get(/databases/$(database)/documents/users/$(userId)).data.banUntil)
+        ));
+    }
+    
+    function getUserRole(userId) {
+      let isTargetDoc = request.path.size() > 0 && request.path[4] == 'users' && request.path[5] == userId;
+      return isTargetDoc ? 
+        (resource != null ? resource.data.role : 'user') 
+        : 
+        (exists(/databases/$(database)/documents/users/$(userId)) ? get(/databases/$(database)/documents/users/$(userId)).data.role : 'user');
+    }
+    
+    function isAdmin() {
+      return isAuthenticated() && 
+             (getUserRole(request.auth.uid) == 'admin' || getUserRole(request.auth.uid) == 'super_admin');
+    }
+    
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+    
+    function isIdeaOwner() {
+      return isAuthenticated() && request.auth.uid == resource.data.authorId;
+    }
+    
+    function existing() { return resource.data; }
+    function incoming() { return request.resource.data; }
+    
+    function onlyAffected(fields) {
+      return incoming().diff(existing()).affectedKeys().hasOnly(fields);
+    }
+    
+    // ============================================================
+    // 1. مجموعة users
+    // ============================================================
+    match /users/{userId} {
+      // السماح بالقراءة والتعديل أثناء التسجيل للمستخدم
+      allow read, create: if isOwner(userId);
+      allow update: if isAuthenticated() && isNotBanned(userId) && (
+        isAdmin() ||
+        (isOwner(userId) && 
+         !incoming().diff(existing()).affectedKeys().hasAny(['role', 'email', 'createdAt', 'isBanned', 'banUntil', 'banReason'])) ||
+        (incoming().diff(existing()).affectedKeys().hasOnly(['followersCount', 'followingCount']))
+      );
+      allow delete: if isAdmin();
+    }
+    
+    // ============================================================
+    // 2. مجموعة ideas
+    // ============================================================
+    match /ideas/{ideaId} {
+      allow list: if isAuthenticated() && isNotBanned(request.auth.uid);
+      allow get: if true;
+      allow create: if isAuthenticated() && isNotBanned(request.auth.uid) && 
+                     incoming().authorId == request.auth.uid;
+      
+      allow update: if isAuthenticated() && isNotBanned(request.auth.uid) && (
+        isAdmin() ||
+        isIdeaOwner() ||
+        (onlyAffected(['likes']) && 
+         (incoming().likes == existing().likes + 1 || incoming().likes == existing().likes - 1) &&
+         exists(/databases/$(database)/documents/ideas/$(ideaId)/likes/$(request.auth.uid))) ||
+        (onlyAffected(['views']) && 
+         incoming().views == existing().views + 1 &&
+         !exists(/databases/$(database)/documents/ideas/$(ideaId)/views/$(request.auth.uid)))
+      );
+      
+      allow delete: if isAdmin() || isIdeaOwner();
+      
+      match /likes/{userId} {
+        allow read, write: if isOwner(userId);
+      }
+      match /views/{userId} {
+        allow read, write: if isOwner(userId);
+      }
+    }
+    
+    // ============================================================
+    // 3. مجموعة comments
+    // ============================================================
+    match /comments/{commentId} {
+      allow list: if isAuthenticated();
+      allow get: if true;
+      allow create: if isAuthenticated() && isNotBanned(request.auth.uid) && 
+                     incoming().userId == request.auth.uid;
+      allow update: if isAuthenticated() && isNotBanned(request.auth.uid) && (
+        isAdmin() ||
+        isOwner(resource.data.userId) ||
+        onlyAffected(['likes', 'replies', 'likedBy'])
+      );
+      allow delete: if isAdmin() || isOwner(resource.data.userId);
+    }
+    
+    // ============================================================
+    // 4. مجموعة follows
+    // ============================================================
+    match /follows/{followId} {
+      allow list: if isAuthenticated();
+      allow create: if isAuthenticated() && isNotBanned(request.auth.uid) && 
+                     incoming().followerId == request.auth.uid;
+      allow delete: if isAuthenticated() && (isAdmin() || existing().followerId == request.auth.uid);
+    }
+    
+    // ============================================================
+    // 5. مجموعة suggestions
+    // ============================================================
+    match /suggestions/{suggestionId} {
+      allow read: if isAuthenticated() && (isAdmin() || resource.data.authorId == request.auth.uid);
+      allow create: if isAuthenticated() && isNotBanned(request.auth.uid) && 
+                     incoming().authorId == request.auth.uid;
+      allow update: if isAdmin();
+      allow delete: if isAdmin();
+    }
+    
+    // ============================================================
+    // 6. مجموعة messages
+    // ============================================================
+    match /messages/{messageId} {
+      allow read: if isAuthenticated() && (isAdmin() || resource.data.toUserId == request.auth.uid);
+      allow create: if isAdmin();
+      allow update: if isAuthenticated() && (isAdmin() || 
+                     (resource.data.toUserId == request.auth.uid && onlyAffected(['read'])));
+      allow delete: if isAdmin();
+    }
+    
+    // ============================================================
+    // 7. مجموعات النظام والإدارة
+    // ============================================================
+    match /system/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    
+    match /notifications/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    
+    match /admin_chats/{id} {
+      allow read, write: if isAdmin();
+    }
+    
+    match /quotes/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    
+    match /courses/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    
+    match /bookmarks/{id} {
+      allow read: if isAuthenticated() && resource.data.userId == request.auth.uid;
+      allow write: if isAuthenticated() && incoming().userId == request.auth.uid;
+    }
+    
+    match /about_sections/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    
+    match /section_items/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    
+    match /audit_logs/{id} {
+      allow read, write: if isAdmin();
+    }
+    
+    // ============================================================
+    // 8. قاعدة أمان عامة
+    // ============================================================
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
