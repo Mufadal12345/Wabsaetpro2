@@ -1,0 +1,233 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ==========================================
+    // 1. GLOBAL HELPERS
+    // ==========================================
+
+    function isSignedIn() { return request.auth != null; }
+    function isOwner(userId) { return isSignedIn() && request.auth.uid == userId; }
+    function incoming() { return request.resource.data; }
+    function existing() { return resource.data; }
+    
+    function isValidId(id) { 
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$'); 
+    }
+
+    // Role-based Access Control
+    // Note: We check the users collection for the admin role
+    function getRole() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('role', 'user');
+    }
+    function isAdmin() {
+      return isSignedIn() && (getRole() == 'admin' || getRole() == 'super_admin');
+    }
+    function isSuperAdmin() {
+      return isSignedIn() && getRole() == 'super_admin';
+    }
+    function isNotBanned() {
+      return isSignedIn() && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('isBanned', false) == false;
+    }
+
+    // ==========================================
+    // 2. DEFAULT DENY
+    // ==========================================
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // ==========================================
+    // 3. ENTITY VALIDATIONS
+    // ==========================================
+
+    // --- Users ---
+    function isValidUser(data) {
+      return data.keys().hasAll(['name', 'email', 'role', 'isBanned', 'createdAt']) &&
+             data.name is string && data.name.size() > 0 && data.name.size() <= 100 &&
+             data.email is string && data.email.size() <= 150 &&
+             data.role in ['super_admin', 'admin', 'user'] &&
+             data.isBanned is bool &&
+             (data.get('photoURL', '') is string && data.get('photoURL', '').size() <= 1024) &&
+             (data.get('bio', '') is string && data.get('bio', '').size() <= 500);
+    }
+
+    // --- Ideas ---
+    function isValidIdea(data) {
+      return data.keys().hasAll(['title', 'content', 'authorId', 'createdAt', 'views', 'likes']) &&
+             data.title is string && data.title.size() <= 150 &&
+             data.content is string && data.content.size() <= 10000 &&
+             data.authorId == request.auth.uid &&
+             data.views is number && data.views >= 0 &&
+             data.likes is number && data.likes >= 0 &&
+             (data.get('category', '') is string && data.get('category', '').size() <= 50) &&
+             (data.get('viewedBy', []) is list && data.get('viewedBy', []).size() <= 10000);
+    }
+
+    // --- Comments ---
+    function isValidComment(data) {
+      return data.keys().hasAll(['ideaId', 'text', 'userId', 'createdAt']) &&
+             data.ideaId is string && isValidId(data.ideaId) &&
+             data.text is string && data.text.size() > 0 && data.text.size() <= 1000 &&
+             data.userId == request.auth.uid;
+    }
+
+    function isEmailVerified() {
+      // If the app doesn't require email verification yet, we can skip this or make it optional.
+      // But based on security mandate:
+      return request.auth.token.email_verified == true;
+    }
+
+    // ==========================================
+    // 4. COLLECTION RULES
+    // ==========================================
+
+    // --- Users ---
+    match /users/{userId} {
+      // PII Isolation: Prevent any user from reading another's full document (containing email)
+      allow get: if isOwner(userId) || isAdmin();
+      allow list: if isAdmin();
+      
+      allow create: if isOwner(userId) && 
+                    isValidUser(incoming()) && 
+                    incoming().role == 'user' && 
+                    incoming().isBanned == false &&
+                    incoming().createdAt == request.time;
+                    
+      allow update: if (
+        isOwner(userId) && 
+        incoming().role == existing().role &&
+        incoming().isBanned == existing().isBanned &&
+        incoming().createdAt == existing().createdAt &&
+        incoming().diff(existing()).affectedKeys().hasOnly(['name', 'photoURL', 'bio', 'specialty', 'updatedAt', 'lastLogin', 'followingCount', 'followersCount']) &&
+        incoming().get('updatedAt', request.time) == request.time
+      ) || isAdmin();
+      
+      allow delete: if isSuperAdmin();
+    }
+
+    // --- Ideas ---
+    match /ideas/{ideaId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn() && isNotBanned() && isValidIdea(incoming()) && incoming().createdAt == request.time;
+      
+      allow update: if (
+        isSignedIn() && isNotBanned() && (
+          // Action: Author Edit
+          (isOwner(existing().authorId) && 
+           incoming().authorId == existing().authorId &&
+           incoming().createdAt == existing().createdAt &&
+           incoming().diff(existing()).affectedKeys().hasOnly(['title', 'content', 'category', 'updatedAt', 'link', 'tags', 'hashtags', 'mediaUrl', 'mediaType', 'likes', 'views', 'viewedBy', 'isPinned', 'pinnedAt']) &&
+           incoming().get('updatedAt', request.time) == request.time) ||
+          
+          // Action: Interaction (View/Like) - restricted fields
+          (incoming().diff(existing()).affectedKeys().hasOnly(['views', 'likes', 'viewedBy']) &&
+           incoming().views >= existing().views &&
+           incoming().likes >= existing().likes - 1 &&
+           (incoming().get('viewedBy', []).hasAll(existing().viewedBy) && 
+            incoming().viewedBy.size() <= existing().viewedBy.size() + 1))
+        )
+      ) || isAdmin();
+      
+      allow delete: if isOwner(existing().authorId) || isAdmin();
+      
+      match /likes/{userId} {
+        allow read: if isSignedIn();
+        allow write: if isOwner(userId) && isNotBanned();
+      }
+    }
+
+    // --- Comments ---
+    match /comments/{commentId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn() && isNotBanned() && isValidComment(incoming()) && incoming().createdAt == request.time;
+      allow update: if (isOwner(existing().userId) && 
+                        incoming().diff(existing()).affectedKeys().hasOnly(['text', 'updatedAt']) &&
+                        incoming().get('updatedAt', request.time) == request.time) || isAdmin();
+      allow delete: if isOwner(existing().userId) || isAdmin();
+    }
+
+    // --- Social & Follows ---
+    match /follows/{followId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn() && isNotBanned() && 
+                    incoming().followerId == request.auth.uid &&
+                    incoming().createdAt == request.time;
+      allow delete: if isOwner(existing().followerId) || isAdmin();
+    }
+
+    match /social/{userId} {
+      allow read: if isSignedIn();
+      allow write: if isOwner(userId) || isAdmin();
+    }
+
+    // --- Stories & Notes ---
+    match /stories/{storyId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn() && isNotBanned() && incoming().createdAt == request.time;
+      allow update: if (
+        isSignedIn() && (
+          incoming().diff(existing()).affectedKeys().hasOnly(['viewers', 'likes']) &&
+          incoming().viewers.size() <= existing().viewers.size() + 1
+        )
+      ) || isOwner(existing().userId) || isAdmin();
+      allow delete: if isOwner(existing().userId) || isAdmin();
+    }
+
+    match /notes/{noteId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn() && isNotBanned() && incoming().userId == request.auth.uid;
+      allow delete: if isOwner(existing().userId) || isAdmin();
+    }
+
+    // --- Admin & Misc ---
+    match /suggestions/{suggId} {
+      allow read: if isAdmin() || (isSignedIn() && existing().authorId == request.auth.uid);
+      allow create: if isSignedIn() && incoming().authorId == request.auth.uid;
+      allow update, delete: if isAdmin();
+    }
+
+    match /notifications/{notifId} {
+      allow read: if isSignedIn() && (existing().recipientId == request.auth.uid || isAdmin());
+      allow create: if isSignedIn(); // Users can trigger notifications for others via cloud functions or directly if needed
+      allow update: if (isOwner(existing().recipientId) && incoming().diff(existing()).affectedKeys().hasOnly(['read', 'updatedAt'])) || isAdmin();
+      allow delete: if isOwner(existing().recipientId) || isAdmin();
+    }
+
+    match /quotes/{quoteId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /courses/{courseId} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
+
+    match /bookmarks/{bookmarkId} {
+      allow read: if isOwner(existing().userId);
+      allow write: if isOwner(incoming().get('userId', existing().get('userId', ''))) && isNotBanned();
+    }
+
+    match /audit_logs/{logId} {
+      allow read: if isAdmin();
+      allow create: if isSignedIn();
+    }
+
+    match /about_sections/{sectionId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /section_items/{itemId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /messages/{messageId} {
+       allow read: if isSignedIn() && (existing().fromId == request.auth.uid || isAdmin());
+       allow create: if isSignedIn() && incoming().fromId == request.auth.uid;
+       allow update, delete: if isAdmin();
+    }
+  }
+}

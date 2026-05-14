@@ -1,0 +1,399 @@
+{
+  "../components/ConfirmModal.tsx": [
+    "../pages/admin/Modal.tsx"
+  ],
+  "../components/EditableAvatar.tsx": [
+    "../contexts/ToastContext.tsx",
+    "../firebase.ts",
+    "../supabase.ts",
+    "../types.ts",
+    "features/auth/hooks/useAuth.ts"
+  ],
+  "../components/ErrorBoundary.tsx": [],
+  "../components/HomeIdeaListItem.tsx": [
+    "../components/Icons.tsx",
+    "../components/LinkPreview.tsx",
+    "../components/UserAvatar.tsx",
+    "../contexts/DataContext.tsx",
+    "../contexts/ToastContext.tsx",
+    "../firebase.ts",
+    "../hooks/useAppQueries.ts",
+    "../hooks/useIntersectionObserver.ts",
+    "../types.ts",
+    "../utils.ts"
+  ],
+  "../components/Icons.tsx": [],
+  "../components/LinkPreview.tsx": [],
+  "../components/Logo.tsx": [],
+  "../components/MediaRouter.tsx": [
+    "../components/HomeIdeaListItem.tsx",
+    "../components/ProfileMedia.tsx",
+    "../types.ts"
+  ],
+  "../components/Onboarding.tsx": [
+    "../components/Icons.tsx"
+  ],
+  "../components/ProfileMedia.tsx": [
+    "../components/Icons.tsx",
+    "../types.ts",
+    "../utils.ts"
+  ],
+  "../components/SettingsMenu.tsx": [
+    "../components/UserAvatar.tsx",
+    "../contexts/AuthContext.tsx",
+    "features/settings/hooks/useSidebarBadges.ts"
+  ],
+  "../components/Skeletons.tsx": [],
+  "../components/UserAvatar.tsx": [
+    "../contexts/AuthContext.tsx"
+  ],
+  "../components/home/StoriesBar.tsx": [
+    "../components/UserAvatar.tsx",
+    "../contexts/AuthContext.tsx",
+    "../contexts/DataContext.tsx",
+    "../contexts/ToastContext.tsx",
+    "../firebase.ts"
+  ],
+  "../components/layout/AppLayout.tsx": [
+    "../components/Icons.tsx",
+    "../components/UserAvatar.tsx",
+    "../components/layout/BottomNav.tsx",
+    "../components/layout/TopBar.tsx",
+    "../hooks/useFeedActions.ts",
+    "../pages/admin/Modal.tsx"
+  ],
+  "../components/layout/BottomNav.tsx": [
+    "../components/UserAvatar.tsx",
+    "../contexts/AuthContext.tsx"
+  ],
+  "../components/layout/TopBar.tsx": [
+    "../components/Icons.tsx",
+    "../firebase.ts"
+  ],
+  "../contexts/AuthContext.tsx": [
+    "../contexts/ToastContext.tsx",
+    "../firebase.ts",
+    "../types.ts"
+  ],
+  "../contexts/DataContext.tsx": [
+    "../contexts/AuthContext.tsx",
+    "../hooks/useAppQueries.ts",
+    "../types.ts"
+  ],
+  "../contexts/ToastContext.tsx": [],
+  "../firebase-applet-config.json": [],
+  "../firebase.ts": [
+    "../firebase-applet-config.json"
+  ],
+  "../hooks/useAppQueries.ts": [
+    "../contexts/AuthContext.tsx",
+    "../firebase.ts",
+    "../types.ts"
+  ],
+  "../hooks/useFeedActions.ts": [
+    "../contexts/AuthContext.tsx",
+    "../contexts/DataContext.tsx",
+    "../contexts/ToastContext.tsx",
+    "../firebase.ts",
+    "../types.ts",
+    "../utils.ts"
+  ],
+  "../hooks/useIntersectionObserver.ts": [],
+  "../pages/About.tsx": [
+    "../components/Icons.tsx",
+    "../components/Logo.tsx"
+  ],
+  "../pages/Home.tsx": [
+    "../components/Icons.tsx",
+    "../components/MediaRouter.tsx",
+    "../components/Skeletons.tsx",
+    "../components/home/StoriesBar.tsx",
+    "../hooks/useAppQueries.ts",
+    "../hooks/useFeedActions.ts",
+    "../types.ts"
+  ],
+  "../pages/Ideas.tsx": [
+    "../components/Icons.tsx",
+    "../components/MediaRouter.tsx",
+    "../components/Skeletons.tsx",
+    "../components/UserAvatar.tsx",
+    "../hooks/useAppQueries.ts",
+    "../hooks/useFeedActions.ts",
+    "../pages/admin/Modal.tsx"
+  ],
+  "../pages/Login.tsx": [
+    "../contexts/ToastContext.tsx",
+    "features/auth/hooks/useAuth.ts"
+  ],
+  "../pages/Notifications.tsx": [
+    "../firebase.ts"
+  ],
+  "../pages/Profile.tsx": [
+    "../components/ConfirmModal.tsx",
+    "../components/EditableAvatar.tsx",
+    "../components/Icons.tsx",
+    "../components/MediaRouter.tsx",
+    "../components/SettingsMenu.tsx",
+    "../components/UserAvatar.tsx",
+    "../contexts/AuthContext.tsx",
+    "../contexts/DataContext.tsx",
+    "../contexts/ToastContext.tsx",
+    "../firebase.ts",
+    "../hooks/useAppQueries.ts",
+    "../hooks/useFeedActions.ts",
+    "../pages/admin/Modal.tsx",
+    "../types.ts"
+  ],
+  "../pages/Search.tsx": [
+    "../components/Icons.tsx",
+    "../components/MediaRouter.tsx",
+    "../contexts/AuthContext.tsx",
+    "../contexts/DataContext.tsx",
+    "../hooks/useFeedActions.ts"
+  ],
+  "../pages/Suggestions.tsx": [
+    "../components/ConfirmModal.tsx",
+    "../components/Icons.tsx",
+    "../contexts/AuthContext.tsx",
+    "../contexts/DataContext.tsx",
+    "../contexts/ToastContext.tsx",
+    "../firebase.ts"
+  ],
+  "../pages/Visuals.tsx": [
+    "../components/Icons.tsx",
+    "../components/MediaRouter.tsx",
+    "../components/Skeletons.tsx",
+    "../components/UserAvatar.tsx",
+    "../hooks/useFeedActions.ts",
+    "../pages/admin/Modal.tsx",
+    "features/ideas/queries/idea.queries.ts"
+  ],
+  "../pages/admin/AdminAuditLogs.tsx": [
+    "../components/Icons.tsx",
+    "../contexts/DataContext.tsx",
+    "../hooks/useIntersectionObserver.ts"
+  ],
+  "../pages/admin/AdminChat.tsx": [
+    "../components/Icons.tsx",
+    "../contexts/AuthContext.tsx",
+    "../contexts/DataContext.tsx",
+    "../contexts/ToastContext.tsx",
+    "../firebase.ts"
+  ],
+  "../pages/admin/AdminComments.tsx": [
+    "../components/Icons.tsx",
+    "../contexts/DataContext.tsx",
+    "../contexts/ToastContext.tsx",
+    "../firebase.ts",
+    "../hooks/useIntersectionObserver.ts"
+  ],
+  "../pages/admin/AdminNotifications.tsx": [
+    "../components/Icons.tsx",
+    "../contexts/AuthContext.tsx",
+    "../contexts/DataContext.tsx",
+    "../contexts/ToastContext.tsx",
+    "../firebase.ts",
+    "../types.ts"
+  ],
+  "../pages/admin/AdminSections.tsx": [
+    "../components/Icons.tsx",
+    "../contexts/AuthContext.tsx",
+    "../contexts/DataContext.tsx",
+    "../contexts/ToastContext.tsx",
+    "../firebase.ts",
+    "../pages/admin/Modal.tsx"
+  ],
+  "../pages/admin/AdminSettings.tsx": [],
+  "../pages/admin/Dashboard.tsx": [
+    "../contexts/DataContext.tsx",
+    "../firebase.ts"
+  ],
+  "../pages/admin/Members.tsx": [
+    "../components/Icons.tsx",
+    "../components/Skeletons.tsx",
+    "../contexts/AuthContext.tsx",
+    "../contexts/DataContext.tsx",
+    "../contexts/ToastContext.tsx",
+    "../firebase.ts",
+    "../hooks/useIntersectionObserver.ts",
+    "../pages/admin/Modal.tsx",
+    "../types.ts",
+    "../utils/adminUtils.ts"
+  ],
+  "../pages/admin/Messages.tsx": [
+    "../components/Icons.tsx",
+    "../contexts/AuthContext.tsx",
+    "../contexts/DataContext.tsx",
+    "../contexts/ToastContext.tsx",
+    "../firebase.ts",
+    "../pages/admin/Modal.tsx"
+  ],
+  "../pages/admin/Modal.tsx": [],
+  "../supabase.ts": [],
+  "../types.ts": [],
+  "../utils.ts": [],
+  "../utils/adminUtils.ts": [
+    "../firebase.ts",
+    "../types.ts"
+  ],
+  "App.tsx": [
+    "../components/ErrorBoundary.tsx",
+    "../components/Onboarding.tsx",
+    "../components/layout/AppLayout.tsx",
+    "../pages/About.tsx",
+    "../pages/Home.tsx",
+    "../pages/Ideas.tsx",
+    "../pages/Login.tsx",
+    "../pages/Notifications.tsx",
+    "../pages/Profile.tsx",
+    "../pages/Search.tsx",
+    "../pages/Suggestions.tsx",
+    "../pages/Visuals.tsx",
+    "../pages/admin/AdminAuditLogs.tsx",
+    "../pages/admin/AdminChat.tsx",
+    "../pages/admin/AdminComments.tsx",
+    "../pages/admin/AdminNotifications.tsx",
+    "../pages/admin/AdminSections.tsx",
+    "../pages/admin/AdminSettings.tsx",
+    "../pages/admin/Dashboard.tsx",
+    "../pages/admin/Members.tsx",
+    "../pages/admin/Messages.tsx",
+    "app/providers/AppProviders.tsx",
+    "features/auth/hooks/useAuth.ts",
+    "features/settings/pages/SettingsRoutes.tsx",
+    "shared/hoc/withAdminAuth.tsx"
+  ],
+  "app/providers/AppProviders.tsx": [
+    "../contexts/AuthContext.tsx",
+    "../contexts/DataContext.tsx",
+    "../contexts/ToastContext.tsx",
+    "features/auth/context/AuthContext.tsx",
+    "shared/lib/react-query.ts"
+  ],
+  "features/auth/context/AuthContext.tsx": [
+    "../firebase.ts",
+    "features/auth/queries/auth.queries.ts",
+    "features/auth/services/auth.service.ts",
+    "features/auth/types/auth.types.ts",
+    "shared/constants/queryKeys.ts"
+  ],
+  "features/auth/hooks/useAuth.ts": [
+    "features/auth/context/AuthContext.tsx",
+    "features/auth/services/auth.service.ts",
+    "shared/constants/queryKeys.ts"
+  ],
+  "features/auth/queries/auth.queries.ts": [
+    "features/auth/services/auth.service.ts",
+    "shared/constants/queryKeys.ts"
+  ],
+  "features/auth/services/auth.service.ts": [
+    "../firebase.ts",
+    "../supabase.ts",
+    "features/auth/types/auth.types.ts",
+    "services/firebase/firebase.service.ts"
+  ],
+  "features/auth/types/auth.types.ts": [],
+  "features/ideas/queries/idea.queries.ts": [
+    "features/ideas/services/idea.service.ts",
+    "shared/constants/queryKeys.ts"
+  ],
+  "features/ideas/services/idea.service.ts": [
+    "../firebase.ts",
+    "features/auth/types/auth.types.ts",
+    "features/ideas/types/idea.types.ts",
+    "services/firebase/firebase.service.ts"
+  ],
+  "features/ideas/types/idea.types.ts": [
+    "features/auth/types/auth.types.ts"
+  ],
+  "features/settings/components/SettingsLayout.tsx": [
+    "../components/Icons.tsx",
+    "../contexts/AuthContext.tsx",
+    "features/settings/config/sidebar.config.tsx"
+  ],
+  "features/settings/config/sidebar.config.tsx": [
+    "features/settings/types/sidebar.types.ts"
+  ],
+  "features/settings/hooks/useSettings.ts": [
+    "features/settings/services/settings.service.ts",
+    "features/settings/types/settings.types.ts",
+    "shared/constants/queryKeys.ts"
+  ],
+  "features/settings/hooks/useSidebarBadges.ts": [
+    "../firebase.ts"
+  ],
+  "features/settings/pages/AccessibilitySettings.tsx": [
+    "features/auth/hooks/useAuth.ts",
+    "features/settings/hooks/useSettings.ts"
+  ],
+  "features/settings/pages/AccountSettings.tsx": [
+    "../components/UserAvatar.tsx",
+    "features/auth/hooks/useAuth.ts",
+    "services/firebase/firebase.service.ts",
+    "shared/constants/queryKeys.ts"
+  ],
+  "features/settings/pages/ActivitySettings.tsx": [
+    "../firebase.ts",
+    "features/auth/hooks/useAuth.ts"
+  ],
+  "features/settings/pages/AppearanceSettings.tsx": [
+    "features/auth/hooks/useAuth.ts",
+    "features/settings/hooks/useSettings.ts"
+  ],
+  "features/settings/pages/FollowersSettings.tsx": [
+    "../firebase.ts",
+    "features/auth/hooks/useAuth.ts"
+  ],
+  "features/settings/pages/LanguageSettings.tsx": [
+    "features/auth/hooks/useAuth.ts",
+    "features/settings/hooks/useSettings.ts"
+  ],
+  "features/settings/pages/NotificationSettings.tsx": [
+    "features/auth/hooks/useAuth.ts",
+    "features/settings/hooks/useSettings.ts"
+  ],
+  "features/settings/pages/PrivacySettings.tsx": [
+    "features/auth/hooks/useAuth.ts",
+    "features/settings/hooks/useSettings.ts"
+  ],
+  "features/settings/pages/SecuritySettings.tsx": [
+    "features/auth/hooks/useAuth.ts",
+    "features/auth/services/auth.service.ts"
+  ],
+  "features/settings/pages/SessionsSettings.tsx": [
+    "features/auth/services/auth.service.ts"
+  ],
+  "features/settings/pages/SettingsHome.tsx": [
+    "../components/Icons.tsx",
+    "../contexts/AuthContext.tsx",
+    "features/settings/config/sidebar.config.tsx"
+  ],
+  "features/settings/pages/SettingsRoutes.tsx": [
+    "features/settings/components/SettingsLayout.tsx",
+    "features/settings/pages/AccessibilitySettings.tsx",
+    "features/settings/pages/AccountSettings.tsx",
+    "features/settings/pages/ActivitySettings.tsx",
+    "features/settings/pages/AppearanceSettings.tsx",
+    "features/settings/pages/FollowersSettings.tsx",
+    "features/settings/pages/LanguageSettings.tsx",
+    "features/settings/pages/NotificationSettings.tsx",
+    "features/settings/pages/PrivacySettings.tsx",
+    "features/settings/pages/SecuritySettings.tsx",
+    "features/settings/pages/SessionsSettings.tsx",
+    "features/settings/pages/SettingsHome.tsx"
+  ],
+  "features/settings/services/settings.service.ts": [
+    "../firebase.ts",
+    "features/settings/types/settings.types.ts"
+  ],
+  "features/settings/types/settings.types.ts": [],
+  "features/settings/types/sidebar.types.ts": [],
+  "services/firebase/firebase.service.ts": [
+    "../firebase.ts"
+  ],
+  "shared/constants/queryKeys.ts": [],
+  "shared/hoc/withAdminAuth.tsx": [
+    "features/auth/hooks/useAuth.ts"
+  ],
+  "shared/lib/react-query.ts": []
+}

@@ -1,0 +1,290 @@
+{
+  "entities": {
+    "Story": {
+      "title": "Story",
+      "description": "A user story",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "userImg": { "type": "string" },
+        "userName": { "type": "string" },
+        "text": { "type": "string" },
+        "linkUrl": { "type": "string" },
+        "backgroundGradient": { "type": "string" },
+        "viewers": { "type": "array", "items": { "type": "string" } },
+        "likes": { "type": "array", "items": { "type": "string" } },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "userImg", "userName", "createdAt"]
+    },
+    "StoryComment": {
+      "title": "StoryComment",
+      "description": "A comment on a story",
+      "type": "object",
+      "properties": {
+        "storyId": { "type": "string" },
+        "userId": { "type": "string" },
+        "userName": { "type": "string" },
+        "userImg": { "type": "string" },
+        "text": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["storyId", "userId", "text", "createdAt"]
+    },
+    "SocialRelation": {
+      "title": "SocialRelation",
+      "description": "User social relations (followers/following)",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "followers": { "type": "array", "items": { "type": "string" } },
+        "following": { "type": "array", "items": { "type": "string" } }
+      },
+      "required": ["userId", "followers", "following"]
+    },
+    "Note": {
+      "title": "Note",
+      "description": "A short status note",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "content": { "type": "string" },
+        "userImg": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "expiresAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "content", "userImg", "createdAt", "expiresAt"]
+    },
+    "User": {
+      "title": "User",
+      "description": "A user of the platform",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string", "description": "Display name" },
+        "email": { "type": "string", "format": "email" },
+        "bio": { "type": "string", "description": "User biography" },
+        "specialty": { "type": "string" },
+        "role": { "type": "string", "enum": ["super_admin", "admin", "user"] },
+        "isBanned": { "type": "boolean" },
+        "authMethod": { "type": "string" },
+        "emailVerified": { "type": "boolean" },
+        "photoURL": { "type": "string" },
+        "followersCount": { "type": "number" },
+        "followingCount": { "type": "number" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "lastLogin": { "type": "string", "format": "date-time" }
+      },
+      "required": ["name", "email", "role", "isBanned", "createdAt"]
+    },
+    "Follow": {
+      "title": "Follow",
+      "description": "A follow relationship",
+      "type": "object",
+      "properties": {
+        "followerId": { "type": "string" },
+        "followingId": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["followerId", "followingId", "createdAt"]
+    },
+    "Idea": {
+      "title": "Idea",
+      "description": "An intellectual idea or article",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "category": { "type": "string" },
+        "content": { "type": "string" },
+        "author": { "type": "string" },
+        "authorId": { "type": "string" },
+        "authorRole": { "type": "string", "enum": ["admin", "user"] },
+        "views": { "type": "number" },
+        "viewedBy": { "type": "array", "items": { "type": "string" } },
+        "likes": { "type": "number" },
+        "likedBy": { "type": "array", "items": { "type": "string" } },
+        "featured": { "type": "boolean" },
+        "deleted": { "type": "boolean" },
+        "hashtags": { "type": "array", "items": { "type": "string" } },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["title", "content", "authorId", "createdAt"]
+    },
+    "Comment": {
+      "title": "Comment",
+      "description": "A comment on an idea",
+      "type": "object",
+      "properties": {
+        "ideaId": { "type": "string" },
+        "text": { "type": "string" },
+        "userId": { "type": "string" },
+        "authorName": { "type": "string" },
+        "authorRole": { "type": "string", "enum": ["admin", "user"] },
+        "likes": { "type": "number" },
+        "likedBy": { "type": "array", "items": { "type": "string" } },
+        "parentCommentId": { "type": "string" },
+        "replies": { "type": "number" },
+        "deleted": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["ideaId", "text", "userId", "createdAt"]
+    },
+    "Course": {
+      "title": "Course",
+      "description": "A learning resource or course",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "type": { "type": "string" },
+        "description": { "type": "string" },
+        "link": { "type": "string" },
+        "addedBy": { "type": "string" },
+        "addedByRole": { "type": "string", "enum": ["admin", "user"] },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["title", "link", "addedBy", "createdAt"]
+    },
+    "Quote": {
+      "title": "Quote",
+      "description": "An inspirational quote",
+      "type": "object",
+      "properties": {
+        "text": { "type": "string" },
+        "author": { "type": "string" },
+        "isDefault": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["text", "author", "createdAt"]
+    },
+    "Suggestion": {
+      "title": "Suggestion",
+      "description": "A user suggestion",
+      "type": "object",
+      "properties": {
+        "type": { "type": "string" },
+        "title": { "type": "string" },
+        "content": { "type": "string" },
+        "author": { "type": "string" },
+        "authorId": { "type": "string" },
+        "status": {
+          "type": "string",
+          "enum": ["pending", "approved", "rejected", "replied"]
+        },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["title", "content", "authorId", "status", "createdAt"]
+    },
+    "Message": {
+      "title": "Message",
+      "description": "A message between users or to admin",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "content": { "type": "string" },
+        "from": { "type": "string" },
+        "fromId": { "type": "string" },
+        "read": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["title", "content", "fromId", "createdAt"]
+    },
+    "Bookmark": {
+      "title": "Bookmark",
+      "description": "A bookmarked course",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "courseId": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "courseId", "createdAt"]
+    },
+    "AboutSection": {
+      "title": "AboutSection",
+      "description": "A dynamic section for the About page",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "content": { "type": "string" },
+        "isVisible": { "type": "boolean" },
+        "order": { "type": "number" },
+        "ownerId": { "type": "string" },
+        "hiddenByOwner": { "type": "boolean" },
+        "isProjectInfo": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["title", "content", "isVisible", "order", "createdAt"]
+    },
+    "SectionItem": {
+      "title": "SectionItem",
+      "description": "An item within a dynamic section",
+      "type": "object",
+      "properties": {
+        "sectionId": { "type": "string" },
+        "title": { "type": "string" },
+        "content": { "type": "string" },
+        "image": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["sectionId", "title", "content", "createdAt"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": { "schema": "User", "description": "User profiles" },
+    "/ideas/{ideaId}": {
+      "schema": "Idea",
+      "description": "Intellectual ideas"
+    },
+    "/comments/{commentId}": {
+      "schema": "Comment",
+      "description": "Comments on ideas"
+    },
+    "/courses/{courseId}": {
+      "schema": "Course",
+      "description": "Learning resources"
+    },
+    "/quotes/{quoteId}": {
+      "schema": "Quote",
+      "description": "Inspirational quotes"
+    },
+    "/suggestions/{suggestionId}": {
+      "schema": "Suggestion",
+      "description": "User suggestions"
+    },
+    "/messages/{messageId}": {
+      "schema": "Message",
+      "description": "System messages"
+    },
+    "/bookmarks/{bookmarkId}": {
+      "schema": "Bookmark",
+      "description": "User bookmarks"
+    },
+    "/about_sections/{sectionId}": {
+      "schema": "AboutSection",
+      "description": "Dynamic sections for the About page"
+    },
+    "/section_items/{itemId}": {
+      "schema": "SectionItem",
+      "description": "Items within dynamic sections"
+    },
+    "/follows/{followId}": {
+      "schema": "Follow",
+      "description": "User follow relationships"
+    },
+    "/stories/{storyId}": {
+      "schema": "Story",
+      "description": "User stories"
+    },
+    "/notes/{noteId}": {
+      "schema": "Note",
+      "description": "User status notes"
+    },
+    "/social/{userId}": {
+      "schema": "SocialRelation",
+      "description": "User follow/following relations"
+    },
+    "/story_comments/{commentId}": {
+      "schema": "StoryComment",
+      "description": "Comments on user stories"
+    }
+  }
+}
