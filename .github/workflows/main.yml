@@ -18,14 +18,14 @@ jobs:
           node-version: '18'
 
       - name: Install Dependencies
-        # تم إضافة --legacy-peer-deps لتجاوز خطأ التضارب في الإصدارات
         run: npm install --legacy-peer-deps
 
       - name: Build Web App
         run: npm run build
 
       - name: Sync Capacitor
-        run: npx cap sync android
+        # تغيير طريقة الاستدعاء لضمان العثور على المسار الصحيح
+        run: npx @capacitor/cli sync android
 
       - name: Setup Java 17
         uses: actions/setup-java@v4
