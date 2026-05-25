@@ -15,10 +15,11 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18' # يتوافق تماماً مع إعداداتك
+          node-version: '18'
 
       - name: Install Dependencies
-        run: npm install
+        # تم إضافة --legacy-peer-deps لتجاوز خطأ التضارب في الإصدارات
+        run: npm install --legacy-peer-deps
 
       - name: Build Web App
         run: npm run build
@@ -32,12 +33,10 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Grant Execute Permission for Gradlew
-        run: chmod +x android/gradlew
-
       - name: Build Android APK
         run: |
           cd android
+          chmod +x gradlew
           ./gradlew assembleDebug
 
       - name: Upload APK
