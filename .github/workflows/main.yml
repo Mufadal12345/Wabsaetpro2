@@ -9,26 +9,39 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - name: Setup Node
-        uses: actions/setup-node@v3
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
-          node-version: '18'
-      - run: npm install
-      - run: npm run build
-      - run: npx cap sync android
-      - name: Setup Java
-        uses: actions/setup-java@v3
+          node-version: '18' # يتوافق تماماً مع إعداداتك
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Build Web App
+        run: npm run build
+
+      - name: Sync Capacitor
+        run: npx cap sync android
+
+      - name: Setup Java 17
+        uses: actions/setup-java@v4
         with:
           java-version: '17'
           distribution: 'temurin'
-      - name: Build APK
+
+      - name: Grant Execute Permission for Gradlew
+        run: chmod +x android/gradlew
+
+      - name: Build Android APK
         run: |
           cd android
-          chmod +x gradlew
           ./gradlew assembleDebug
+
       - name: Upload APK
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: app-debug
           path: android/app/build/outputs/apk/debug/app-debug.apk
